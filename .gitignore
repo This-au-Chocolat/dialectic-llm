@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+.uv/
+
+# Entorno
+.env
+.env.*.local
+
+# Datos / artefactos
+logs_local/
+logs/**/*.tmp
+analytics/**/*.tmp
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

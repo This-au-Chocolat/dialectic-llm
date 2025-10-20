@@ -1,0 +1,8 @@
+thesis:
+  temperature: 0.70
+antithesis:
+  temperature: 0.50
+synthesis:
+  temperature: 0.20
+tas:
+  k: 1

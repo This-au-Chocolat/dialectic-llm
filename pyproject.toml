@@ -1,0 +1,47 @@
+[project]
+name = "dialectic-llm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "This-au-Chocolat", email = "2309122@upy.edu.mx" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastparquet>=2024.11.0",
+    "pandas>=2.3.3",
+    "prefect>=3.4.24",
+    "pyarrow>=21.0.0",
+    "pydantic>=2.12.3",
+    "python-dotenv>=1.1.1",
+    "scikit-learn>=1.7.2",
+    "scipy>=1.16.2",
+    "sentence-transformers>=5.1.1",
+]
+
+[project.scripts]
+dialectic-llm = "dialectic_llm:main"
+
+[build-system]
+requires = ["uv_build>=0.8.17,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.1",
+]
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["logs_local", "data", "analytics/parquet"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E203"]  # compatible con ruff-format
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
