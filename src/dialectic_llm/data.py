@@ -11,6 +11,7 @@ def load_batch(n: int, seed: int, split: str = "train"):
     dataset = load_dataset("gsm8k", "main", split=split)
     return dataset.shuffle(seed=seed).select(range(n))
 
+
 def normalize_answer(answer: str) -> str:
     """
     Normalizes a numerical answer string by extracting the last numerical
@@ -37,7 +38,7 @@ def normalize_answer(answer: str) -> str:
         cleaned = potential_number.replace(",", "").replace(" ", "").strip()
 
         # If there are multiple dots, assume they are thousand separators
-        if cleaned.count('.') > 1:
-            cleaned = cleaned.replace('.', '')
+        if cleaned.count(".") > 1:
+            cleaned = cleaned.replace(".", "")
 
         return cleaned
