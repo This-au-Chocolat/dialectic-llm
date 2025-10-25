@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "datasets>=2.20.0",
     "fastparquet>=2024.11.0",
     "pandas>=2.3.3",
     "prefect>=3.4.24",
@@ -45,3 +46,4 @@ ignore = ["E203"]  # compatible con ruff-format
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+pythonpath = ["src"]
