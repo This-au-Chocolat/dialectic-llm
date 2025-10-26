@@ -29,7 +29,7 @@ def normalize_answer(answer: str) -> str:
             # Remove commas
             cleaned_answer = number_str.replace(",", "")
             # Remove trailing dot if it is the last character
-            if cleaned_answer.endswith('.'):
+            if cleaned_answer.endswith("."):
                 cleaned_answer = cleaned_answer[:-1]
             return cleaned_answer
         else:
