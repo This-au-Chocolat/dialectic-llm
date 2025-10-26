@@ -21,10 +21,19 @@ def normalize_answer(answer: str) -> str:
     parts = answer.split("####")
     if len(parts) > 1:
         # GSM8K format found, take the part after "####"
-        final_answer = parts[1]
-        # Remove commas and spaces
-        cleaned_answer = final_answer.replace(",", "").strip()
-        return cleaned_answer
+        final_answer = parts[1].strip()
+        # Extract the number from the beginning of the string
+        match = re.match(r"[\d,.]+", final_answer)
+        if match:
+            number_str = match.group(0)
+            # Remove commas
+            cleaned_answer = number_str.replace(",", "")
+            # Remove trailing dot if it is the last character
+            if cleaned_answer.endswith('.'):
+                cleaned_answer = cleaned_answer[:-1]
+            return cleaned_answer
+        else:
+            return ""  # No number found
     else:
         # Fallback for cases where "####" is not present
         # Find all sequences that look like numbers
