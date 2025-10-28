@@ -1,6 +1,6 @@
 """Tests for evaluation functions."""
 
-from src.utils.evaluation import evaluate_exact_match
+from utils.evaluation import evaluate_exact_match
 
 
 def test_evaluate_exact_match_casos_borde():

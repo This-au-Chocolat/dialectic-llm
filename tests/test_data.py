@@ -1,6 +1,6 @@
 import pytest
 
-from src.dialectic_llm.data import normalize_answer
+from dialectic_llm.data import normalize_answer
 
 
 @pytest.mark.parametrize(
