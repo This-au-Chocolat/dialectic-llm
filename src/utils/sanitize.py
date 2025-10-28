@@ -10,6 +10,10 @@ ALLOW = {
     "metrics",
     "prompt_hash",
     "response_hash",
+    "tokens",  # Token counts
+    "estimated_cost_usd",  # Cost estimation
+    "model",  # Model used
+    "timestamp",  # Timing info
 }
 
 
