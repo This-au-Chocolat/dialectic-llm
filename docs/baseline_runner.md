@@ -149,6 +149,44 @@ WARNING: Cost limit reached ($50.00). Stopping at 150 problems.
 ```
 **Normal:** El sistema para automáticamente para evitar gastos excesivos.
 
+## Analytics y S1-10
+
+Los logs JSONL generados por el baseline runner pueden convertirse automáticamente a formato Parquet para análisis eficiente:
+
+### Conversión Manual
+```bash
+# Convertir logs específicos a Parquet
+python src/utils/jsonl_to_parquet.py file logs/events/events_20251101.jsonl analytics/parquet/baseline.parquet
+
+# Agregar por run_id (recomendado)
+python src/utils/jsonl_to_parquet.py aggregate your-run-id-here
+```
+
+### Workflow Automatizado
+```bash
+# Ejecutar baseline con conversión automática (S1-10)
+python demo_s1_10_analytics.py --problems 200 --model gpt-4
+```
+
+### Análisis con Pandas
+```python
+import pandas as pd
+
+# Leer resultados del baseline
+df = pd.read_parquet('analytics/parquet/run_baseline-001.parquet')
+
+# Métricas básicas
+accuracy = df['is_correct'].mean()
+total_cost = df['estimated_cost_usd'].sum()
+total_tokens = df['tokens'].apply(lambda x: x.get('total_tokens', 0)).sum()
+
+print(f"Accuracy: {accuracy:.3f}")
+print(f"Total cost: ${total_cost:.4f}")
+print(f"Total tokens: {total_tokens:,}")
+```
+
+Ver [S1-10 Analytics Documentation](s1_10_analytics.md) para detalles completos.
+
 ## Próximos Pasos
 
 Una vez completado S1-06:
