@@ -6,7 +6,7 @@ Integrado con el sistema dialectic-llm.
 import json
 import os
 
-from src.utils.logging import log_event
+from src.utils.log_utils import log_event
 
 # --- Datos de ejemplo ---
 

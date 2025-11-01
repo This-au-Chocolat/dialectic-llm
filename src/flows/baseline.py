@@ -11,7 +11,7 @@ from prefect import flow, task
 from dialectic_llm.data import load_batch
 from llm.client import LLMClient, create_baseline_prompt, extract_gsm8k_answer
 from utils.evaluation import evaluate_exact_match
-from utils.logging import create_run_summary, log_event_jsonl
+from utils.log_utils import create_run_summary, log_event_jsonl
 
 
 @task(name="load_gsm8k_batch")
