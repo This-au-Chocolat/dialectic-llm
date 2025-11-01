@@ -5,7 +5,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from utils.logging import create_run_summary, log_event, log_event_jsonl, log_local_cot
+from utils.log_utils import create_run_summary, log_event, log_event_jsonl, log_local_cot
 
 
 def test_log_event_jsonl():
