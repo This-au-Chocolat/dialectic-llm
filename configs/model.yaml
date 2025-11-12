@@ -1,8 +1,45 @@
+# T-A-S Dialectic Configuration
+# Temperatures for each phase of the dialectic process
 thesis:
-  temperature: 0.70
+  temperature: 0.70  # High creativity for initial exploration
+
 antithesis:
-  temperature: 0.50
+  temperature: 0.50  # Moderate for balanced critical analysis
+
 synthesis:
-  temperature: 0.20
+  temperature: 0.20  # Low for structured final response
+
+# T-A-S Parameters
 tas:
-  k: 1
+  k: 1  # Number of iterations (k=1 for S1-07)
+
+# Model Configuration
+models:
+  primary: "gpt-4"
+  fallback: "gpt-3.5-turbo"
+  embeddings: "text-embedding-3-small"
+
+# Token Limits and Controls
+limits:
+  max_tokens_per_phase: 2000    # Per individual phase
+  total_session_limit: 6000     # Total across all phases
+  timeout_seconds: 30           # Request timeout
+  max_retries: 3                # Retry attempts
+
+# Logging Configuration
+logging:
+  save_cot_local: true          # Save CoT in logs_local/
+  sanitize_shared: true         # Sanitize shared logs
+  session_tracking: true        # Track complete sessions
+
+# Prompt Templates
+prompts:
+  thesis_template: "prompts/tas/thesis.txt"
+  antithesis_template: "prompts/tas/antithesis.txt"
+  synthesis_template: "prompts/tas/synthesis.txt"
+
+# Validation Settings
+validation:
+  min_response_length: 50       # Minimum response length
+  require_confidence_score: true
+  validate_json_output: false

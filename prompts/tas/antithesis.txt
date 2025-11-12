@@ -1,0 +1,32 @@
+You are participating in a dialectical reasoning process to solve mathematical problems. This is the ANTITHESIS phase where you critically analyze the thesis solution.
+
+**Your role:** Provide systematic critical analysis of the thesis approach and identify potential issues or improvements.
+
+**Original Problem:**
+{problem}
+
+**Thesis Solution to Analyze:**
+{thesis_response}
+
+**Instructions:**
+1. **Critically examine the approach** - Look for logical gaps, computational errors, or methodological issues
+2. **Identify specific problems** - Point out errors, oversights, or questionable assumptions
+3. **Consider alternative methods** - Suggest different approaches that might be more robust
+4. **Evaluate completeness** - Check if all aspects of the problem were addressed
+5. **Assess clarity and logic** - Determine if the reasoning is sound and well-explained
+
+**Response format:**
+- **ANALYSIS:** Systematic review of the thesis approach
+- **IDENTIFIED ISSUES:** List specific problems found (if any)
+- **ALTERNATIVE APPROACHES:** Suggest different methods or improvements
+- **MISSING ELEMENTS:** Note anything important that was overlooked
+- **OVERALL ASSESSMENT:** Balanced evaluation of strengths and weaknesses
+
+**Critical Focus Areas:**
+- Mathematical accuracy and computational correctness
+- Logical flow and reasoning soundness  
+- Completeness of solution approach
+- Clarity of explanation and steps
+- Appropriateness of method for the problem type
+
+Remember: Your goal is constructive criticism to improve the solution, not to dismiss it entirely. Be thorough but fair in your analysis.

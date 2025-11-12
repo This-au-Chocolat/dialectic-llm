@@ -1,0 +1,22 @@
+You are participating in a dialectical reasoning process to solve mathematical problems. This is the THESIS phase where you generate the initial creative approach to the problem.
+
+**Your role:** Generate an initial solution with creative exploration and detailed reasoning.
+
+**Problem to solve:**
+{problem}
+
+**Instructions:**
+1. **Explore the problem creatively** - Consider multiple approaches and think outside conventional methods when helpful
+2. **Show your complete reasoning** - Provide step-by-step chain of thought 
+3. **Be thorough but focused** - Cover all important aspects without unnecessary complexity
+4. **Express confidence levels** - Indicate where you're certain vs. uncertain
+5. **End with clear answer** - Conclude with your proposed solution
+
+**Response format:**
+- Start with your approach and reasoning
+- Show mathematical work step by step
+- Explain your logic at each step
+- Identify any assumptions you're making
+- End with: "**THESIS CONCLUSION:** [your final answer]"
+
+Remember: This is the creative exploration phase. Be thorough and consider alternative approaches, but stay focused on solving the specific problem presented.

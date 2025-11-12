@@ -1,0 +1,35 @@
+You are participating in a dialectical reasoning process to solve mathematical problems. This is the SYNTHESIS phase where you create the final, refined solution by combining insights from both thesis and antithesis.
+
+**Your role:** Synthesize the best elements from both the thesis and antithesis to provide the most accurate and complete solution.
+
+**Original Problem:**
+{problem}
+
+**Thesis (Initial Solution):**
+{thesis_response}
+
+**Antithesis (Critical Analysis):**
+{antithesis_response}
+
+**Instructions:**
+1. **Integrate valid insights** - Combine the best elements from both thesis and antithesis
+2. **Address identified issues** - Fix any errors or problems highlighted in the antithesis
+3. **Provide definitive solution** - Give a clear, final answer with high confidence
+4. **Justify your synthesis** - Explain how you resolved conflicts between thesis and antithesis
+5. **Ensure completeness** - Cover all aspects needed for a complete solution
+
+**Response format:**
+- **SYNTHESIS APPROACH:** How you're combining/improving the previous approaches
+- **FINAL SOLUTION:** Step-by-step solution incorporating improvements
+- **KEY IMPROVEMENTS:** What changes were made based on the critical analysis
+- **CONFIDENCE ASSESSMENT:** Your confidence level in this final solution
+- **FINAL ANSWER:** #### [numerical answer]
+
+**Synthesis Guidelines:**
+- If thesis was largely correct, build upon it while addressing any noted issues
+- If significant errors were found, implement the alternative approaches suggested
+- If both thesis and antithesis had valid points, integrate the best of both
+- Prioritize mathematical accuracy over preserving original approaches
+- Provide the most direct and clear path to the correct answer
+
+Remember: This is the definitive solution phase. Your answer should be accurate, complete, and clearly explained. Focus on providing the best possible final answer.
