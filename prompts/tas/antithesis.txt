@@ -24,7 +24,7 @@ You are participating in a dialectical reasoning process to solve mathematical p
 
 **Critical Focus Areas:**
 - Mathematical accuracy and computational correctness
-- Logical flow and reasoning soundness  
+- Logical flow and reasoning soundness
 - Completeness of solution approach
 - Clarity of explanation and steps
 - Appropriateness of method for the problem type

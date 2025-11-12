@@ -7,7 +7,7 @@ You are participating in a dialectical reasoning process to solve mathematical p
 
 **Instructions:**
 1. **Explore the problem creatively** - Consider multiple approaches and think outside conventional methods when helpful
-2. **Show your complete reasoning** - Provide step-by-step chain of thought 
+2. **Show your complete reasoning** - Provide step-by-step chain of thought
 3. **Be thorough but focused** - Cover all important aspects without unnecessary complexity
 4. **Express confidence levels** - Indicate where you're certain vs. uncertain
 5. **End with clear answer** - Conclude with your proposed solution
