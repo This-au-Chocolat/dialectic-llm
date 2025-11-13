@@ -12,17 +12,17 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import pandas as pd
 from prefect import flow, get_run_logger, task
 from prefect.tasks import task_input_hash
 
-from src.llm.client import LLMClient
+from llm.client import LLMClient
 
 # Import existing infrastructure
-from src.utils.config import get_tas_config
-from src.utils.log_utils import log_event_jsonl, log_local_cot
-from src.utils.sanitize import sanitize_advanced
-from src.utils.tokens import count_tokens
+from utils.config import get_tas_config
+from utils.log_utils import log_event_jsonl, log_local_cot
+from utils.parquet_utils import create_tas_parquet
+from utils.sanitize import sanitize_advanced
+from utils.tokens import count_tokens
 
 
 # -------------------------------
@@ -471,9 +471,9 @@ def log_tas_result(result: Dict[str, Any]) -> None:
 
 
 @task(name="create_tas_parquet")
-def create_tas_parquet(results: List[Dict[str, Any]], run_id: str) -> str:
+def create_tas_parquet_task(results: List[Dict[str, Any]], run_id: str) -> str:
     """
-    Create Parquet file from T-A-S results for analytics.
+    Create Parquet file from T-A-S results for analytics (Prefect task wrapper).
 
     Args:
         results: List of result dictionaries
@@ -482,35 +482,7 @@ def create_tas_parquet(results: List[Dict[str, Any]], run_id: str) -> str:
     Returns:
         Path to created Parquet file
     """
-    # Prepare data for Parquet
-    df_data = []
-    for result in results:
-        row = {
-            "run_id": result["run_id"],
-            "problem_id": result["problem_id"],
-            "dataset": result["dataset"],
-            "phase": result["phase"],
-            "model": result["model"],
-            "is_correct": result["is_correct"],
-            "true_answer": result["true_answer"],
-            "predicted_answer_raw": result["predicted_answer_raw"],
-            "has_error": result.get("error") is not None,
-            "prompt_tokens": result.get("tas_usage", {}).get("prompt_tokens", 0),
-            "completion_tokens": result.get("tas_usage", {}).get("completion_tokens", 0),
-            "total_tokens": result.get("tas_usage", {}).get("total_tokens", 0),
-        }
-        df_data.append(row)
-
-    # Create DataFrame and save as Parquet
-    df = pd.DataFrame(df_data)
-
-    # Ensure analytics directory exists
-    Path("analytics/parquet").mkdir(parents=True, exist_ok=True)
-
-    parquet_path = f"analytics/parquet/tas_{run_id}.parquet"
-    df.to_parquet(parquet_path, index=False)
-
-    return parquet_path
+    return create_tas_parquet(results, run_id)
 
 
 # -------------------------------
@@ -630,7 +602,7 @@ def run_tas_gsm8k(
 
     # Create Parquet file for analytics
     print("📊 Creating analytics Parquet...")
-    parquet_path = create_tas_parquet(results, run_id)
+    parquet_path = create_tas_parquet_task(results, run_id)
     print(f"💾 Results saved to: {parquet_path}")
 
     # Create run summary

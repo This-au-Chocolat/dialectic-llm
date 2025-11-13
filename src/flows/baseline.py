@@ -2,16 +2,15 @@
 
 import uuid
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import pandas as pd
 from prefect import flow, task
 
 from dialectic_llm.data import load_batch
 from llm.client import LLMClient, create_baseline_prompt, extract_gsm8k_answer
 from utils.evaluation import evaluate_exact_match
 from utils.log_utils import create_run_summary, log_event_jsonl
+from utils.parquet_utils import create_results_parquet
 
 
 @task(name="load_gsm8k_batch")
@@ -164,9 +163,9 @@ def log_baseline_result(result: Dict[str, Any]) -> None:
 
 
 @task(name="create_results_parquet")
-def create_results_parquet(results: List[Dict[str, Any]], run_id: str) -> str:
+def create_results_parquet_task(results: List[Dict[str, Any]], run_id: str) -> str:
     """
-    Create a Parquet file with baseline results.
+    Create a Parquet file with baseline results (Prefect task wrapper).
 
     Args:
         results: List of result dictionaries
@@ -175,37 +174,7 @@ def create_results_parquet(results: List[Dict[str, Any]], run_id: str) -> str:
     Returns:
         Path to created Parquet file
     """
-    # Create analytics directory
-    analytics_dir = Path("analytics/parquet")
-    analytics_dir.mkdir(parents=True, exist_ok=True)
-
-    # Create DataFrame
-    df_data = []
-    for result in results:
-        row = {
-            "run_id": result["run_id"],
-            "problem_id": result["problem_id"],
-            "dataset": result["dataset"],
-            "phase": result["phase"],
-            "model": result["model"],
-            "is_correct": result["is_correct"],
-            "true_answer": result["true_answer"],
-            "predicted_answer": result["predicted_answer"],
-            "has_error": bool(result.get("error")),
-            "prompt_tokens": result.get("llm_usage", {}).get("prompt_tokens", 0),
-            "completion_tokens": result.get("llm_usage", {}).get("completion_tokens", 0),
-            "total_tokens": result.get("llm_usage", {}).get("total_tokens", 0),
-        }
-        df_data.append(row)
-
-    df = pd.DataFrame(df_data)
-
-    # Save to Parquet
-    filename = f"baseline_{run_id}.parquet"
-    filepath = analytics_dir / filename
-    df.to_parquet(filepath, index=False)
-
-    return str(filepath)
+    return create_results_parquet(results, run_id)
 
 
 @flow(name="baseline_gsm8k_flow", log_prints=True)
@@ -304,7 +273,7 @@ def run_baseline_gsm8k(
 
     # Create Parquet file
     print("Creating Parquet file...")
-    parquet_path = create_results_parquet(results, run_id)
+    parquet_path = create_results_parquet_task(results, run_id)
     print(f"Results saved to: {parquet_path}")
 
     # Create run summary
