@@ -109,14 +109,12 @@ def demo_logging_integration():
             "user_email": "user@example.com",
         }
 
-        sanitized = sanitize_advanced(
-            data=test_data_dict, salt="demo-salt", fields_to_hash=["user_email"]
-        )
+        _ = sanitize_advanced(data=test_data_dict, salt="demo-salt", fields_to_hash=["user_email"])
         print("✅ Sanitization working: PII patterns detected and handled")
 
         # Test logging infrastructure exists
         try:
-            from src.utils.log_utils import log_event_jsonl, log_local_cot
+            from src.utils.log_utils import log_event_jsonl, log_local_cot  # noqa: F401
 
             print("✅ Logging infrastructure available")
         except ImportError as e:
