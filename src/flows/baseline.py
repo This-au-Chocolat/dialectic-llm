@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from prefect import flow, task
@@ -30,21 +30,73 @@ def load_gsm8k_batch(n: int, seed: int = 42) -> List[Dict[str, Any]]:
 
     problems = []
     for i, item in enumerate(dataset):
+        # Extract numeric answer from GSM8K format (after ####)
+        from llm.client import extract_gsm8k_answer
+
+        numeric_answer = extract_gsm8k_answer(item["answer"])
+
+        try:
+            answer_float = float(numeric_answer.replace(",", ""))
+        except (ValueError, AttributeError):
+            # Fallback: try to find last number in answer
+            import re
+
+            numbers = re.findall(r"[\d,]+", item["answer"])
+            answer_float = float(numbers[-1].replace(",", "")) if numbers else 0.0
+
         problems.append(
             {
                 "problem_id": f"gsm8k_{i:04d}",
                 "question": item["question"],
-                "answer": float(item["answer"]),  # GSM8K answers are numeric
-                "answer_raw": item["answer"],
+                "answer": answer_float,  # Extracted numeric answer
+                "answer_raw": item["answer"],  # Full GSM8K answer with steps
             }
         )
 
     return problems
 
 
+def _create_mock_response(question: str, expected_answer: float) -> Dict[str, Any]:
+    """Create a mock LLM response for dry-run mode."""
+    # Simple heuristic: if it's an addition problem, get it right most of the time
+    import random
+
+    # Extract numbers from question (for potential mock logic)
+    # numbers = re.findall(r'\d+', question)  # Not currently used
+
+    if random.random() < 0.8:  # 80% accuracy for mock
+        mock_answer = int(expected_answer)
+        completion = (
+            f"Let me solve this step by step.\nThe answer is {mock_answer}.\n#### {mock_answer}"
+        )
+    else:
+        # Wrong answer 20% of the time
+        wrong_answer = int(expected_answer) + random.randint(1, 5)
+        completion = (
+            f"Let me solve this step by step.\nThe answer is {wrong_answer}.\n#### {wrong_answer}"
+        )
+
+    return {
+        "completion": completion,
+        "model": "mock-gpt-4",
+        "usage": {
+            "prompt_tokens": 50 + len(question) // 4,
+            "completion_tokens": 25,
+            "total_tokens": 75 + len(question) // 4,
+        },
+        "finish_reason": "stop",
+        "response_id": f"mock-{random.randint(1000, 9999)}",
+        "created": int(datetime.now().timestamp()),
+    }
+
+
 @task(name="solve_baseline_problem")
 def solve_baseline_problem(
-    problem: Dict[str, Any], run_id: str, llm_client: LLMClient, model: str = "gpt-4"
+    problem: Dict[str, Any],
+    run_id: str,
+    llm_client: Optional[LLMClient] = None,
+    model: str = "gpt-4",
+    dry_run: bool = False,
 ) -> Dict[str, Any]:
     """
     Solve a single GSM8K problem using baseline approach.
@@ -52,8 +104,9 @@ def solve_baseline_problem(
     Args:
         problem: Problem dictionary with question and answer
         run_id: Unique identifier for this run
-        llm_client: LLM client instance
+        llm_client: LLM client instance (None for dry run)
         model: Model to use
+        dry_run: If True, use mock response
 
     Returns:
         Result dictionary with prediction and evaluation
@@ -61,13 +114,16 @@ def solve_baseline_problem(
     # Create baseline prompt
     prompt = create_baseline_prompt(problem["question"])
 
-    # Make LLM call
-    response = llm_client.call(
-        prompt=prompt,
-        model=model,
-        temperature=0.7,  # Standard baseline temperature
-        max_tokens=1000,
-    )
+    # Make LLM call (real or mock)
+    if dry_run or llm_client is None:
+        response = _create_mock_response(problem["question"], problem["answer"])
+    else:
+        response = llm_client.call(
+            prompt=prompt,
+            model=model,
+            temperature=0.7,  # Standard baseline temperature
+            max_tokens=1000,
+        )
 
     # Extract answer
     predicted_answer_raw = extract_gsm8k_answer(response["completion"])
@@ -154,7 +210,11 @@ def create_results_parquet(results: List[Dict[str, Any]], run_id: str) -> str:
 
 @flow(name="baseline_gsm8k_flow", log_prints=True)
 def run_baseline_gsm8k(
-    n_problems: int = 200, seed: int = 42, model: str = "gpt-4", run_id: str = None
+    n_problems: int = 200,
+    seed: int = 42,
+    model: str = "gpt-4",
+    run_id: Optional[str] = None,
+    dry_run: bool = False,
 ) -> Dict[str, Any]:
     """
     Run baseline evaluation on GSM8K problems.
@@ -164,6 +224,7 @@ def run_baseline_gsm8k(
         seed: Random seed for reproducibility
         model: LLM model to use
         run_id: Unique run identifier (auto-generated if None)
+        dry_run: If True, use mock responses instead of real API calls
 
     Returns:
         Summary of the run results
@@ -175,8 +236,21 @@ def run_baseline_gsm8k(
     print(f"Starting baseline run: {run_id}")
     print(f"Problems: {n_problems}, Model: {model}, Seed: {seed}")
 
+    if dry_run:
+        print("🔄 DRY RUN MODE: Using mock responses")
+
     # Initialize LLM client
-    llm_client = LLMClient(model=model)
+    try:
+        llm_client = LLMClient(model=model)
+        if dry_run:
+            print("✅ LLM client initialized (dry run mode)")
+    except ValueError as e:
+        if "API key" in str(e):
+            print("⚠️  No valid API key found - enabling dry run mode")
+            dry_run = True
+            llm_client = None
+        else:
+            raise
 
     # Load problems
     print("Loading GSM8K problems...")
@@ -189,11 +263,11 @@ def run_baseline_gsm8k(
     total_cost = 0.0
 
     for i, problem in enumerate(problems):
-        print(f"Solving problem {i+1}/{len(problems)}: {problem['problem_id']}")
+        print(f"Solving problem {i + 1}/{len(problems)}: {problem['problem_id']}")
 
         # Solve the problem
         result = solve_baseline_problem(
-            problem=problem, run_id=run_id, llm_client=llm_client, model=model
+            problem=problem, run_id=run_id, llm_client=llm_client, model=model, dry_run=dry_run
         )
 
         # Log the result
@@ -204,14 +278,18 @@ def run_baseline_gsm8k(
         # Track cost (rough estimate)
         tokens = result.get("llm_usage", {}).get("total_tokens", 0)
         if tokens > 0:
-            # Rough cost estimate for gpt-4: $0.03 per 1K prompt tokens,
-            # $0.06 per 1K completion tokens. Simplified: use $0.045 per 1K tokens average
-            cost = (tokens / 1000) * 0.045
+            if dry_run:
+                # Mock cost for dry run (much lower)
+                cost = (tokens / 1000) * 0.001  # $0.001 per 1K tokens for testing
+            else:
+                # Real cost estimate for gpt-4: $0.03 per 1K prompt tokens,
+                # $0.06 per 1K completion tokens. Simplified: use $0.045 per 1K tokens average
+                cost = (tokens / 1000) * 0.045
             total_cost += cost
 
-        # Safety check: don't spend too much
-        if total_cost > 50.0:  # Stop if cost exceeds $50
-            print(f"WARNING: Cost limit reached (${total_cost:.2f}). Stopping at {i+1} problems.")
+        # Safety check: don't spend too much (skip in dry run)
+        if not dry_run and total_cost > 50.0:  # Stop if cost exceeds $50
+            print(f"WARNING: Cost limit reached (${total_cost:.2f}). Stopping at {i + 1} problems.")
             break
 
     # Calculate metrics
@@ -248,5 +326,17 @@ def run_baseline_gsm8k(
 
 if __name__ == "__main__":
     # Run with default parameters for testing
-    result = run_baseline_gsm8k(n_problems=5, model="gpt-4")  # Small test run
+    import os
+
+    # Check if we have a real API key
+    api_key = os.getenv("OPENAI_API_KEY", "")
+    has_real_key = api_key and not api_key.startswith("sk-demo")
+
+    if has_real_key:
+        print("🔑 Real API key detected - running small test with real calls")
+        result = run_baseline_gsm8k(n_problems=3, model="gpt-4", dry_run=False)
+    else:
+        print("🔄 Demo/no API key - running dry run test")
+        result = run_baseline_gsm8k(n_problems=10, model="gpt-4", dry_run=True)
+
     print(f"Test run completed: {result}")
