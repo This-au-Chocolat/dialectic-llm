@@ -349,37 +349,9 @@ def load_tas_batch(n: int, seed: int = 42) -> List[Dict[str, Any]]:
     Returns:
         List of problem dictionaries
     """
-    # Import here to avoid circular imports
-    from dialectic_llm.data import load_batch
+    from utils.data_utils import load_gsm8k_batch
 
-    dataset = load_batch(n=n, seed=seed)
-
-    problems = []
-    for i, item in enumerate(dataset):
-        # Extract numeric answer from GSM8K format (after ####)
-        from llm.client import extract_gsm8k_answer
-
-        numeric_answer = extract_gsm8k_answer(item["answer"])
-
-        try:
-            answer_float = float(numeric_answer.replace(",", ""))
-        except (ValueError, AttributeError):
-            # Fallback: try to find last number in answer
-            import re
-
-            numbers = re.findall(r"[\d,]+", item["answer"])
-            answer_float = float(numbers[-1].replace(",", "")) if numbers else 0.0
-
-        problems.append(
-            {
-                "problem_id": f"gsm8k_{i:04d}",
-                "question": item["question"],
-                "answer": answer_float,  # Extracted numeric answer
-                "answer_raw": item["answer"],  # Full GSM8K answer with steps
-            }
-        )
-
-    return problems
+    return load_gsm8k_batch(n=n, seed=seed)
 
 
 @task(name="solve_tas_problem")

@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 
 from prefect import flow, task
 
-from dialectic_llm.data import load_batch
 from llm.client import LLMClient, create_baseline_prompt, extract_gsm8k_answer
 from utils.evaluation import evaluate_exact_match
 from utils.log_utils import create_run_summary, log_event_jsonl
@@ -14,9 +13,9 @@ from utils.parquet_utils import create_results_parquet
 
 
 @task(name="load_gsm8k_batch")
-def load_gsm8k_batch(n: int, seed: int = 42) -> List[Dict[str, Any]]:
+def load_gsm8k_batch_task(n: int, seed: int = 42) -> List[Dict[str, Any]]:
     """
-    Load a batch of GSM8K problems.
+    Prefect task wrapper for loading GSM8K problems.
 
     Args:
         n: Number of problems to load
@@ -25,34 +24,9 @@ def load_gsm8k_batch(n: int, seed: int = 42) -> List[Dict[str, Any]]:
     Returns:
         List of problem dictionaries
     """
-    dataset = load_batch(n=n, seed=seed)
+    from utils.data_utils import load_gsm8k_batch
 
-    problems = []
-    for i, item in enumerate(dataset):
-        # Extract numeric answer from GSM8K format (after ####)
-        from llm.client import extract_gsm8k_answer
-
-        numeric_answer = extract_gsm8k_answer(item["answer"])
-
-        try:
-            answer_float = float(numeric_answer.replace(",", ""))
-        except (ValueError, AttributeError):
-            # Fallback: try to find last number in answer
-            import re
-
-            numbers = re.findall(r"[\d,]+", item["answer"])
-            answer_float = float(numbers[-1].replace(",", "")) if numbers else 0.0
-
-        problems.append(
-            {
-                "problem_id": f"gsm8k_{i:04d}",
-                "question": item["question"],
-                "answer": answer_float,  # Extracted numeric answer
-                "answer_raw": item["answer"],  # Full GSM8K answer with steps
-            }
-        )
-
-    return problems
+    return load_gsm8k_batch(n=n, seed=seed)
 
 
 def _create_mock_response(question: str, expected_answer: float) -> Dict[str, Any]:
@@ -223,7 +197,7 @@ def run_baseline_gsm8k(
 
     # Load problems
     print("Loading GSM8K problems...")
-    problems = load_gsm8k_batch(n=n_problems, seed=seed)
+    problems = load_gsm8k_batch_task(n=n_problems, seed=seed)
     print(f"Loaded {len(problems)} problems")
 
     # Solve problems

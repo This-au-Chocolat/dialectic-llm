@@ -2,7 +2,7 @@
 
 import math
 
-from dialectic_llm.data import normalize_answer
+from utils.data_utils import normalize_answer
 
 
 def evaluate_exact_match(y_true: float, y_pred_raw: str) -> bool:

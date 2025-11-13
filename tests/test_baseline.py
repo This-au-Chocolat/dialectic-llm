@@ -112,7 +112,7 @@ class TestBaselineFlow:
         assert result["usage"]["total_tokens"] == 0
 
     @patch("flows.baseline.LLMClient")
-    @patch("flows.baseline.load_gsm8k_batch")
+    @patch("flows.baseline.load_gsm8k_batch_task")
     def test_baseline_flow_integration(self, mock_load_batch, mock_llm_client):
         """Test baseline flow integration with mocks."""
         # Mock the data loader
