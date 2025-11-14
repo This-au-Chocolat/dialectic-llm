@@ -469,7 +469,7 @@ def run_tas_gsm8k(
     model: str = "gpt-4",
     run_id: Optional[str] = None,
     dry_run: bool = False,
-    max_cost_usd: float = 25.0,
+    max_cost_usd: float = 5.0,
 ) -> Dict[str, Any]:
     """
     Run T-A-S evaluation on GSM8K problems using Prefect orchestration.
@@ -610,7 +610,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--model", type=str, default="gpt-4", help="LLM model")
     parser.add_argument("--dry-run", action="store_true", help="Use mock responses")
-    parser.add_argument("--max-cost", type=float, default=25.0, help="Max cost in USD")
+    parser.add_argument("--max-cost", type=float, default=5.0, help="Max cost in USD")
 
     args = parser.parse_args()
 

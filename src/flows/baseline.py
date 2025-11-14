@@ -158,6 +158,7 @@ def run_baseline_gsm8k(
     model: str = "gpt-4",
     run_id: Optional[str] = None,
     dry_run: bool = False,
+    max_cost_usd: float = 5.0,
 ) -> Dict[str, Any]:
     """
     Run baseline evaluation on GSM8K problems.
@@ -168,6 +169,7 @@ def run_baseline_gsm8k(
         model: LLM model to use
         run_id: Unique run identifier (auto-generated if None)
         dry_run: If True, use mock responses instead of real API calls
+        max_cost_usd: Maximum cost limit in USD
 
     Returns:
         Summary of the run results
@@ -231,7 +233,7 @@ def run_baseline_gsm8k(
             total_cost += cost
 
         # Safety check: don't spend too much (skip in dry run)
-        if not dry_run and total_cost > 50.0:  # Stop if cost exceeds $50
+        if not dry_run and total_cost > max_cost_usd:
             print(f"WARNING: Cost limit reached (${total_cost:.2f}). Stopping at {i + 1} problems.")
             break
 
