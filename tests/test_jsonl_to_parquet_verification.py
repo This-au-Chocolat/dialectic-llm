@@ -1,6 +1,7 @@
 from pathlib import Path
+
 import pandas as pd
-import pytest
+
 
 def test_parquet_file_content():
     """
@@ -21,7 +22,15 @@ def test_parquet_file_content():
         raise ValueError(f"Expected {expected_rows} rows but found {len(df)} in {file_path}")
 
     # Check 3: Required columns
-    required_columns = ['question', 'answer', 'thesis', 'antithesis', 'synthesis', 'final_answer', 'success']
+    required_columns = [
+        "question",
+        "answer",
+        "thesis",
+        "antithesis",
+        "synthesis",
+        "final_answer",
+        "success",
+    ]
     missing_columns = [col for col in required_columns if col not in df.columns]
 
     if missing_columns:

@@ -1,5 +1,5 @@
 """Tests for evaluation functions."""
-import pytest
+
 from utils.evaluation import evaluate_exact_match
 
 

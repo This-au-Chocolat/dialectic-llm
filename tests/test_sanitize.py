@@ -1,6 +1,7 @@
 """Tests for sanitization functions."""
-import pytest
+
 from src.utils.sanitize import sanitize_advanced
+
 
 def test_sanitize_advanced_llm_trace():
     """
@@ -13,27 +14,28 @@ def test_sanitize_advanced_llm_trace():
         "session_id": "session-xyz-456",
         "prompt": "My email is test@example.com and my phone is 555-123-4567. What is 2+2?",
         "response": {
-            "completion": "The answer is 4. My IP is 192.168.1.1 and my credit card is 1234-5678-9012-3456.",
+            "completion": (
+                "The answer is 4. My IP is 192.168.1.1 and my credit card is 1234-5678-9012-3456."
+            ),
             "agent_name": "MathAgent",
-            "api_key": "sk-thisisafakekeyfortesting12345"
+            "api_key": "sk-thisisafakekeyfortesting12345",
         },
         "mathematical_reasoning": "<reasoning>2+2=4</reasoning>",
-        "content_tags": ["math", "llm_trace"]
+        "content_tags": ["math", "llm_trace"],
     }
     salt = "test-salt"
     fields_to_hash = ["user_id", "session_id", "api_key"]
 
-    sanitized_trace = sanitize_advanced(
-        data=llm_trace,
-        salt=salt,
-        fields_to_hash=fields_to_hash
-    )
+    sanitized_trace = sanitize_advanced(data=llm_trace, salt=salt, fields_to_hash=fields_to_hash)
 
     # 1. Check if specified fields are hashed
     import hashlib
+
     expected_user_id_hash = hashlib.sha256((salt + "user-abc-123").encode()).hexdigest()
     expected_session_id_hash = hashlib.sha256((salt + "session-xyz-456").encode()).hexdigest()
-    expected_api_key_hash = hashlib.sha256((salt + "sk-thisisafakekeyfortesting12345").encode()).hexdigest()
+    expected_api_key_hash = hashlib.sha256(
+        (salt + "sk-thisisafakekeyfortesting12345").encode()
+    ).hexdigest()
 
     assert sanitized_trace["user_id"] == expected_user_id_hash
     assert sanitized_trace["session_id"] == expected_session_id_hash
@@ -60,7 +62,7 @@ def test_sanitize_advanced_llm_trace():
 
     # 4. Check sanitization_info
     assert "sanitization_info" in sanitized_trace
-    actions = { (d['field'], d['action']) for d in sanitized_trace["sanitization_info"] }
+    actions = {(d["field"], d["action"]) for d in sanitized_trace["sanitization_info"]}
     assert ("user_id", "hashed") in actions
     assert ("session_id", "hashed") in actions
     assert ("api_key", "hashed") in actions
