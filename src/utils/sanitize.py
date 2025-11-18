@@ -18,12 +18,14 @@ PHONE_REGEX = re.compile(r"(?:\+?\d{1,3}[- ]?)?\(?\d{2,3}\)?[- ]?\d{3,4}[- ]?\d{
 CREDIT_CARD_REGEX = re.compile(r"\b(?:\d{4}[- ]?){3}\d{4}\b")
 IP_ADDRESS_REGEX = re.compile(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b")
 
-REDACTION_PATTERNS = {
-    "EMAIL": EMAIL_REGEX,
-    "PHONE": PHONE_REGEX,
-    "CREDIT_CARD": CREDIT_CARD_REGEX,
-    "IP_ADDRESS": IP_ADDRESS_REGEX,
-}
+# Order matters! More specific patterns (like CREDIT_CARD) should come before
+# more general ones (like PHONE) to avoid partial matches
+REDACTION_PATTERNS = [
+    ("CREDIT_CARD", CREDIT_CARD_REGEX),
+    ("EMAIL", EMAIL_REGEX),
+    ("PHONE", PHONE_REGEX),
+    ("IP_ADDRESS", IP_ADDRESS_REGEX),
+]
 
 # Campos permitidos para compartir (whitelist approach para mayor seguridad)
 ALLOW = {
@@ -83,7 +85,7 @@ def _sanitize_recursive(
 
     if isinstance(data, str):
         sanitized_string = data
-        for name, regex in REDACTION_PATTERNS.items():
+        for name, regex in REDACTION_PATTERNS:
             if regex.search(sanitized_string):
                 sanitized_string = regex.sub(f"[REDACTED_{name}]", sanitized_string)
                 sanitized_actions.append(
