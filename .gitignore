@@ -22,4 +22,4 @@ analytics/**/*.tmp
 .DS_Store
 
 # Reports
-reports/*.pdf
+# reports/*.pdf
