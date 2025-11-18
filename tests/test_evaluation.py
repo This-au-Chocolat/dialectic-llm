@@ -1,33 +1,33 @@
 """Tests for evaluation functions."""
-
+import pytest
 from utils.evaluation import evaluate_exact_match
 
 
-def test_evaluate_exact_match_casos_borde():
+def test_evaluate_exact_match_edge_cases():
     """Test evaluate_exact_match with edge cases."""
-    # --- Casos esperados (True) ---
-    # Caso 1: Coincidencia simple
+    # --- Expected Cases (True) ---
+    # Case 1: Simple match
     assert evaluate_exact_match(y_true=12.0, y_pred_raw="La respuesta es #### 12")
 
-    # Caso 2: Coincidencia con decimales
+    # Case 2: Match with decimals
     assert evaluate_exact_match(y_true=5.5, y_pred_raw="El resultado final es #### 5.5")
 
-    # Caso 3: Caso Borde - Comas (mencionado en S1-04)
+    # Case 3: Edge Case - Commas (mentioned in S1-04)
     assert evaluate_exact_match(y_true=1200.0, y_pred_raw="#### 1,200")
 
-    # Caso 4: Caso Borde - Espacios (mencionado en S1-04)
+    # Case 4: Edge Case - Spaces (mentioned in S1-04)
     assert evaluate_exact_match(y_true=12.0, y_pred_raw="   #### 12   ")
 
-    # Caso 5: Caso Borde - Texto extra despuÃ©s del nÃºmero
+    # Case 5: Edge Case - Extra text after the number
     assert evaluate_exact_match(y_true=12.0, y_pred_raw="#### 12. Es obvio.")
 
-    # --- Casos de Falla (False) ---
+    # --- Failure Cases (False) ---
 
-    # Caso 6: NÃºmero incorrecto
+    # Case 6: Incorrect number
     assert not evaluate_exact_match(y_true=12.0, y_pred_raw="#### 13")
 
-    # Caso 7: Falla de normalizaciÃ³n (formato incorrecto)
-    assert not evaluate_exact_match(y_true=12.0, y_pred_raw="La respuesta no la sÃ©.")
+    # Case 7: Normalization failure (incorrect format)
+    assert not evaluate_exact_match(y_true=12.0, y_pred_raw="La respuesta no la sé.")
 
-    # Caso 8: Falla de normalizaciÃ³n (string vacÃ­o)
+    # Case 8: Normalization failure (empty string)
     assert not evaluate_exact_match(y_true=12.0, y_pred_raw="")
