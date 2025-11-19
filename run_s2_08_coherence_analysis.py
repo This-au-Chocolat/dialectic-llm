@@ -1,13 +1,14 @@
-
 import argparse
-import pandas as pd
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pandas as pd
 
 # Add src to the Python path to allow for absolute imports
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from utils.evaluation import coherence_ts
+
 
 def calculate_coherence_for_run(input_parquet_path: str):
     """
@@ -35,14 +36,10 @@ def calculate_coherence_for_run(input_parquet_path: str):
         print(f"  - Processing {problem_id}...")
         try:
             score = coherence_ts(row["thesis_text"], row["synthesis_text"])
-            coherence_scores.append(
-                {"problem_id": problem_id, "coherence_score": score}
-            )
+            coherence_scores.append({"problem_id": problem_id, "coherence_score": score})
         except Exception as e:
             print(f"    Could not calculate coherence for {problem_id}: {e}")
-            coherence_scores.append(
-                {"problem_id": problem_id, "coherence_score": None}
-            )
+            coherence_scores.append({"problem_id": problem_id, "coherence_score": None})
 
     coherence_df = pd.DataFrame(coherence_scores)
 
@@ -67,10 +64,9 @@ def calculate_coherence_for_run(input_parquet_path: str):
     coherence_df.to_parquet(output_path, index=False)
     print("Done.")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Calculate coherence from a T-A-S Parquet file."
-    )
+    parser = argparse.ArgumentParser(description="Calculate coherence from a T-A-S Parquet file.")
     parser.add_argument(
         "input_file",
         type=str,
