@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 import time
@@ -21,6 +20,7 @@ from llm.client import LLMClient
 from utils.config import get_tas_config
 from utils.log_utils import log_event_jsonl, log_local_cot
 from utils.parquet_utils import create_tas_parquet
+from utils.prompt_utils import hash_prompt, hash_response
 from utils.sanitize import sanitize_advanced
 from utils.tokens import count_tokens
 
@@ -50,9 +50,7 @@ Path("logs_local").mkdir(parents=True, exist_ok=True)
 # -------------------------------
 # Utilities (using existing infrastructure)
 # -------------------------------
-def hash_text(s: str) -> str:
-    """Hash text for consistent identification."""
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+# Note: hash_text removed - use hash_prompt/hash_response from utils.prompt_utils
 
 
 def sanitize_for_public(text: str) -> str:
@@ -188,7 +186,7 @@ def make_prompt_synthesis(thesis_answer: str, critique: str) -> str:
 def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     logger = get_run_logger()
     prompt = make_prompt_thesis(item)
-    prompt_h = hash_text(prompt)
+    prompt_h = hash_prompt(prompt)
 
     # Use configured temperature and model
     resp = llm_call(
@@ -207,7 +205,7 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
         "temperature": config.get_thesis_temperature(),
         "seed": flow_config.seed,
         "prompt_hash": prompt_h,
-        "answer_hash": hash_text(answer),
+        "response_hash": hash_response(answer),
         "usage": resp["usage"],
         "ts": time.time(),
     }
@@ -232,7 +230,7 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
     logger = get_run_logger()
     thesis_answer = t["answer"]
     prompt = make_prompt_antithesis(thesis_answer)
-    prompt_h = hash_text(prompt)
+    prompt_h = hash_prompt(prompt)
 
     resp = llm_call(
         prompt,
@@ -250,7 +248,7 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
         "temperature": config.get_antithesis_temperature(),
         "seed": flow_config.seed + 1,
         "prompt_hash": prompt_h,
-        "critique_hash": hash_text(critique),
+        "response_hash": hash_response(critique),
         "usage": resp["usage"],
         "ts": time.time(),
     }
@@ -277,7 +275,7 @@ def synthesis(
     thesis_answer = t["answer"]
     critique = a["critique"]
     prompt = make_prompt_synthesis(thesis_answer, critique)
-    prompt_h = hash_text(prompt)
+    prompt_h = hash_prompt(prompt)
 
     resp = llm_call(
         prompt,
@@ -295,7 +293,7 @@ def synthesis(
         "temperature": config.get_synthesis_temperature(),
         "seed": flow_config.seed + 2,
         "prompt_hash": prompt_h,
-        "final_hash": hash_text(final_answer),
+        "response_hash": hash_response(final_answer),
         "usage": resp["usage"],
         "ts": time.time(),
     }
