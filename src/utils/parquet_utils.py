@@ -45,6 +45,8 @@ def create_parquet_from_results(
             "is_correct": result["is_correct"],
             "true_answer": result["true_answer"],
             answer_key: result.get(answer_key, result.get("predicted_answer_raw", "")),
+            "thesis_text": result.get("thesis_text", ""),
+            "synthesis_text": result.get("synthesis_text", ""),
             "has_error": bool(result.get("error")),
             "prompt_tokens": result.get(usage_key, {}).get("prompt_tokens", 0),
             "completion_tokens": result.get(usage_key, {}).get("completion_tokens", 0),
