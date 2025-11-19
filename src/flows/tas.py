@@ -21,6 +21,7 @@ from utils.config import get_tas_config
 from utils.log_utils import log_event_jsonl, log_local_cot
 from utils.parquet_utils import create_tas_parquet
 from utils.prompt_utils import hash_prompt, hash_response
+from utils.retry_utils import get_prefect_retry_delays, is_rate_limit_error
 from utils.sanitize import sanitize_advanced
 from utils.tokens import count_tokens
 
@@ -80,11 +81,18 @@ def log_tas_event(event: Dict[str, Any], *, local: bool = False) -> None:
 
 
 def llm_call(
-    prompt: str, *, temperature: float, model: str = "gpt-4", max_tokens: int = 2000
+    prompt: str,
+    *,
+    temperature: float,
+    model: str = "gpt-4",
+    max_tokens: int = 2000,
+    logger: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
-    Make LLM call using existing infrastructure.
+    Make LLM call using existing infrastructure with rate-limit awareness.
     Returns {'text': str, 'raw': dict, 'usage': dict}
+
+    S2-01: Enhanced with rate limit detection and retry logging
     """
     start = time.time()
 
@@ -109,12 +117,13 @@ def llm_call(
         }
     except Exception as e:
         latency = time.time() - start
-        # Fallback with error info
-        return {
-            "text": f"Error: {str(e)}",
-            "raw": {"latency_s": latency, "error": str(e)},
-            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-        }
+
+        # Log rate limit errors for observability (S2-01)
+        if is_rate_limit_error(e) and logger:
+            logger.warning(f"Rate limit detected in LLM call: {str(e)[:100]}")
+
+        # Re-raise to trigger Prefect retry mechanism
+        raise
 
 
 def load_prompt_template(template_name: str) -> str:
@@ -175,11 +184,12 @@ def make_prompt_synthesis(thesis_answer: str, critique: str) -> str:
 
 
 # -------------------------------
-# Tareas Prefect (con retries/backoff)
+# Tareas Prefect (con retries/backoff + rate-limit awareness)
+# S2-01: Enhanced retry logic with exponential backoff and jitter
 # -------------------------------
 @task(
-    retries=2,
-    retry_delay_seconds=[1, 2],  # backoff simple
+    retries=3,
+    retry_delay_seconds=get_prefect_retry_delays(max_retries=3, base_delay=1.0),  # [1s, 2s, 4s]
     cache_key_fn=task_input_hash,
     cache_expiration=timedelta(minutes=10),
 )
@@ -188,12 +198,13 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     prompt = make_prompt_thesis(item)
     prompt_h = hash_prompt(prompt)
 
-    # Use configured temperature and model
+    # Use configured temperature and model with rate-limit aware logging (S2-01)
     resp = llm_call(
         prompt,
         temperature=config.get_thesis_temperature(),
         model=config.get_primary_model(),
         max_tokens=config.get_max_tokens_per_phase(),
+        logger=logger,
     )
     answer = resp["text"]
 
@@ -221,8 +232,8 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
 
 
 @task(
-    retries=2,
-    retry_delay_seconds=[1, 2],
+    retries=3,
+    retry_delay_seconds=get_prefect_retry_delays(max_retries=3, base_delay=1.0),  # [1s, 2s, 4s]
     cache_key_fn=task_input_hash,
     cache_expiration=timedelta(minutes=10),
 )
@@ -237,6 +248,7 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
         temperature=config.get_antithesis_temperature(),
         model=config.get_primary_model(),
         max_tokens=config.get_max_tokens_per_phase(),
+        logger=logger,
     )
     critique = resp["text"]
 
@@ -263,8 +275,8 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
 
 
 @task(
-    retries=2,
-    retry_delay_seconds=[1, 2],
+    retries=3,
+    retry_delay_seconds=get_prefect_retry_delays(max_retries=3, base_delay=1.0),  # [1s, 2s, 4s]
     cache_key_fn=task_input_hash,
     cache_expiration=timedelta(minutes=10),
 )
@@ -282,6 +294,7 @@ def synthesis(
         temperature=config.get_synthesis_temperature(),
         model=config.get_primary_model(),
         max_tokens=config.get_max_tokens_per_phase(),
+        logger=logger,
     )
     final_answer = resp["text"]
 
