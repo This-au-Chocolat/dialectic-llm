@@ -180,7 +180,60 @@ uv run pytest tests/ --cov=src --cov-report=html
 - [x] Reporte Sprint 1
 - [x] Templating de prompts + hashing (S1-16)
 
-## 🛠️ Características Técnicas
+## � Features Implementados (Sprint 2)
+
+### ✅ Robustez y Escalado (S2-01)
+- [x] Retry logic con exponential backoff (1s→2s→4s)
+- [x] Rate limit detection y manejo
+- [x] Prefect flow enhancements
+
+### ✅ Dataset Versioning (S2-04)
+- [x] 200 problem IDs from S1 baseline (seed=42)
+- [x] Content hash verification (3f35ab4bbd)
+- [x] 1-to-1 statistical comparison support
+
+### ✅ Coherencia Semántica (S2-07)
+- [x] SentenceTransformer embeddings (all-mpnet-base-v2)
+- [x] Coherence scoring (Thesis→Synthesis)
+- [x] Cosine similarity calculations
+
+### ✅ Budget Monitoring (S2-09)
+- [x] Token cap per item (≤8k tokens)
+- [x] Budget alerts at 90% threshold
+- [x] Cost tracking vs baseline (≤1.5× target)
+- [x] Real-time projections
+
+## ️ Características Técnicas
+
+### Budget Monitoring y Token Caps (S2-09)
+```python
+from src.utils.budget_monitor import (
+    calculate_budget_status,
+    should_alert_budget,
+    format_budget_alert,
+    load_baseline_stats_from_parquet
+)
+
+# Cargar baseline
+baseline = load_baseline_stats_from_parquet("analytics/parquet/baseline_200.parquet")
+
+# Calcular status actual
+status = calculate_budget_status(
+    run_id="s2-tas-k1",
+    processed_results=results,
+    total_items=200,
+    budget_limit_usd=60.0,
+    baseline_stats=baseline
+)
+
+# Verificar alertas
+if should_alert_budget(status):
+    print(format_budget_alert(status))
+
+# Verificar objetivo ≤1.5× baseline
+if status.is_within_budget_target():
+    print("✅ Within target")
+```
 
 ### Prompt Templating y Hashing (S1-16)
 ```python
