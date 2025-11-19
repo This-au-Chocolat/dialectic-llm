@@ -210,6 +210,7 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
 
     event_public = {
         "run_id": flow_config.run_id,
+        "problem_id": item.get("problem_id"),
         "stage": "thesis",
         "dataset": flow_config.dataset_name,
         "model": flow_config.model_name,
@@ -228,7 +229,7 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     log_tas_event(public_copy, local=False)
 
     logger.info("Thesis done.")
-    return {"answer": answer, "meta": event_public}
+    return {"answer": answer, "meta": event_public, "problem_id": item.get("problem_id")}
 
 
 @task(
@@ -240,6 +241,7 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
 def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     logger = get_run_logger()
     thesis_answer = t["answer"]
+    problem_id = t.get("problem_id")  # Extract problem_id from thesis result
     prompt = make_prompt_antithesis(thesis_answer)
     prompt_h = hash_prompt(prompt)
 
@@ -254,6 +256,7 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
 
     event_public = {
         "run_id": flow_config.run_id,
+        "problem_id": problem_id,  # Add problem_id
         "stage": "antithesis",
         "dataset": flow_config.dataset_name,
         "model": flow_config.model_name,
@@ -271,7 +274,7 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
     log_tas_event(public_copy, local=False)
 
     logger.info("Antithesis done.")
-    return {"critique": critique, "meta": event_public}
+    return {"critique": critique, "meta": event_public, "problem_id": problem_id}
 
 
 @task(
@@ -286,6 +289,7 @@ def synthesis(
     logger = get_run_logger()
     thesis_answer = t["answer"]
     critique = a["critique"]
+    problem_id = a.get("problem_id")  # Extract problem_id from antithesis result
     prompt = make_prompt_synthesis(thesis_answer, critique)
     prompt_h = hash_prompt(prompt)
 
@@ -300,6 +304,7 @@ def synthesis(
 
     event_public = {
         "run_id": flow_config.run_id,
+        "problem_id": problem_id,  # Add problem_id
         "stage": "synthesis",
         "dataset": flow_config.dataset_name,
         "model": flow_config.model_name,
@@ -317,7 +322,7 @@ def synthesis(
     log_tas_event(public_copy, local=False)
 
     logger.info("Synthesis done.")
-    return {"answer": final_answer, "meta": event_public}
+    return {"answer": final_answer, "meta": event_public, "problem_id": problem_id}
 
 
 # -------------------------------
@@ -335,12 +340,18 @@ def run_tas_k1(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, An
         flow_config: TASFlowConfig - flow execution configuration
 
     Returns:
-        dict with 'answer' (final synthesis) and 'meta' (metadata)
+        dict with the results of all three stages: 'thesis', 'antithesis', 'synthesis'
     """
-    t = thesis.submit(item, flow_config)
-    a = antithesis.submit(t, flow_config)
-    s = synthesis.submit(t, a, flow_config)
-    return s.result()
+    t_future = thesis.submit(item, flow_config)
+    a_future = antithesis.submit(t_future, flow_config)
+    s_future = synthesis.submit(t_future, a_future, flow_config)
+
+    # Return results from all stages
+    return {
+        "thesis": t_future.result(),
+        "antithesis": a_future.result(),
+        "synthesis": s_future.result(),
+    }
 
 
 # -------------------------------
@@ -384,7 +395,11 @@ def solve_tas_problem(
 
     # Execute T-A-S flow for this problem
     tas_result = run_tas_k1(problem, flow_config)
-    final_answer_text = tas_result["answer"]
+
+    # Extract texts from the result dictionary
+    thesis_text = tas_result["thesis"]["answer"]
+    synthesis_text = tas_result["synthesis"]["answer"]
+    final_answer_text = synthesis_text  # The final answer is the synthesis text
 
     # Extract numeric answer from T-A-S result
     from llm.client import extract_gsm8k_answer
@@ -396,12 +411,10 @@ def solve_tas_problem(
 
     is_correct = evaluate_exact_match(y_true=problem["answer"], y_pred_raw=predicted_answer_raw)
 
-    # Aggregate usage stats from T-A-S meta
+    # Aggregate usage stats from all T-A-S stages
     total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-
-    # Calculate total tokens across all phases
-    if "meta" in tas_result and "usage" in tas_result["meta"]:
-        usage = tas_result["meta"]["usage"]
+    for stage in ["thesis", "antithesis", "synthesis"]:
+        usage = tas_result[stage]["meta"]["usage"]
         total_usage["prompt_tokens"] += usage.get("prompt_tokens", 0)
         total_usage["completion_tokens"] += usage.get("completion_tokens", 0)
         total_usage["total_tokens"] += usage.get("total_tokens", 0)
@@ -417,6 +430,8 @@ def solve_tas_problem(
         "true_answer": problem["answer"],
         "predicted_answer_raw": predicted_answer_raw,
         "tas_final_text": final_answer_text,
+        "thesis_text": thesis_text,  # Add thesis text
+        "synthesis_text": synthesis_text,  # Add synthesis text
         "is_correct": is_correct,
         "tas_usage": total_usage,
         "error": None,  # T-A-S has internal error handling
