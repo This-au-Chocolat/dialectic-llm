@@ -1,4 +1,3 @@
-
 import pandas as pd
 from statsmodels.stats.contingency_tables import mcnemar
 
@@ -43,12 +42,8 @@ def analyze_(baseline_path, tas_path):
 
     # The contingency table for McNemar's test is based on discordant pairs.
     # We need to count (Baseline Correct, TAS Incorrect) and (Baseline Incorrect, TAS Correct).
-    b = aligned_df[
-        (~aligned_df["is_correct_baseline"]) & (aligned_df["is_correct_tas"])
-    ].shape[0]
-    c = aligned_df[
-        (aligned_df["is_correct_baseline"]) & (~aligned_df["is_correct_tas"])
-    ].shape[0]
+    b = aligned_df[(~aligned_df["is_correct_baseline"]) & (aligned_df["is_correct_tas"])].shape[0]
+    c = aligned_df[(aligned_df["is_correct_baseline"]) & (~aligned_df["is_correct_tas"])].shape[0]
 
     # Check if we have enough discordant pairs for McNemar's test
     if (b + c) < 2:  # At least two discordant pairs are recommended for McNemar's.
