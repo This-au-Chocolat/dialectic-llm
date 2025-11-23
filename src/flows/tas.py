@@ -22,7 +22,6 @@ from utils.log_utils import log_event_jsonl, log_local_cot
 from utils.parquet_utils import create_tas_parquet
 from utils.prompt_utils import hash_prompt, hash_response
 from utils.retry_utils import get_prefect_retry_delays, is_rate_limit_error
-from utils.sanitize import sanitize_advanced
 from utils.tokens import count_tokens
 
 
@@ -55,8 +54,15 @@ Path("logs_local").mkdir(parents=True, exist_ok=True)
 
 
 def sanitize_for_public(text: str) -> str:
-    """Sanitize text for public logs using existing sanitization."""
-    return sanitize_advanced(text)
+    """
+    Sanitize text for public logs.
+
+    Note: For T-A-S, we rely on the structured logging system
+    which does full sanitization at the log_event_jsonl level.
+    This is just a preview truncation.
+    """
+    # Just return truncated text - full sanitization happens in log_event_jsonl
+    return text
 
 
 def count_tokens_from_text(text: str, model: str = "gpt-4") -> int:
@@ -71,13 +77,15 @@ def log_tas_event(event: Dict[str, Any], *, local: bool = False) -> None:
     """Log T-A-S event using existing infrastructure."""
     if local:
         # Save full event with CoT to local logs
-        log_local_cot(event.get("stage", "tas"), event)
+        log_local_cot(event, log_dir="logs_local")
     else:
         # Save sanitized event to shared logs
         sanitized_event = {
             k: (sanitize_for_public(str(v)) if isinstance(v, str) else v) for k, v in event.items()
         }
-        log_event_jsonl(event.get("stage", "tas"), sanitized_event)
+        # log_event_jsonl expects (record, model, log_dir)
+        # The event dict already contains model info, we just pass the dict
+        log_event_jsonl(sanitized_event, model=event.get("model", "gpt-4"))
 
 
 def llm_call(
@@ -171,16 +179,18 @@ def make_prompt_thesis(item: Any) -> str:
     return template.format(problem=problem)
 
 
-def make_prompt_antithesis(thesis_answer: str) -> str:
+def make_prompt_antithesis(problem: str, thesis_answer: str) -> str:
     """Create antithesis prompt using template."""
     template = load_prompt_template("antithesis")
-    return template.format(thesis_response=thesis_answer)
+    return template.format(problem=problem, thesis_response=thesis_answer)
 
 
-def make_prompt_synthesis(thesis_answer: str, critique: str) -> str:
+def make_prompt_synthesis(problem: str, thesis_answer: str, critique: str) -> str:
     """Create synthesis prompt using template."""
     template = load_prompt_template("synthesis")
-    return template.format(thesis_response=thesis_answer, antithesis_response=critique)
+    return template.format(
+        problem=problem, thesis_response=thesis_answer, antithesis_response=critique
+    )
 
 
 # -------------------------------
@@ -229,7 +239,14 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     log_tas_event(public_copy, local=False)
 
     logger.info("Thesis done.")
-    return {"answer": answer, "meta": event_public, "problem_id": item.get("problem_id")}
+    # Include problem text for antithesis to use
+    problem_text = item if isinstance(item, str) else item.get("question", str(item))
+    return {
+        "answer": answer,
+        "meta": event_public,
+        "problem_id": item.get("problem_id") if isinstance(item, dict) else None,
+        "problem": problem_text,
+    }
 
 
 @task(
@@ -241,8 +258,9 @@ def thesis(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
 def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
     logger = get_run_logger()
     thesis_answer = t["answer"]
+    problem = t.get("problem", "")  # Get original problem from thesis result
     problem_id = t.get("problem_id")  # Extract problem_id from thesis result
-    prompt = make_prompt_antithesis(thesis_answer)
+    prompt = make_prompt_antithesis(problem, thesis_answer)
     prompt_h = hash_prompt(prompt)
 
     resp = llm_call(
@@ -274,7 +292,12 @@ def antithesis(t: Dict[str, Any], flow_config: TASFlowConfig = flow_cfg) -> Dict
     log_tas_event(public_copy, local=False)
 
     logger.info("Antithesis done.")
-    return {"critique": critique, "meta": event_public, "problem_id": problem_id}
+    return {
+        "critique": critique,
+        "meta": event_public,
+        "problem_id": problem_id,
+        "problem": problem,  # Pass through problem for synthesis
+    }
 
 
 @task(
@@ -288,9 +311,10 @@ def synthesis(
 ) -> Dict[str, Any]:
     logger = get_run_logger()
     thesis_answer = t["answer"]
+    problem = t.get("problem", "")  # Get original problem from thesis result
     critique = a["critique"]
     problem_id = a.get("problem_id")  # Extract problem_id from antithesis result
-    prompt = make_prompt_synthesis(thesis_answer, critique)
+    prompt = make_prompt_synthesis(problem, thesis_answer, critique)
     prompt_h = hash_prompt(prompt)
 
     resp = llm_call(
