@@ -214,6 +214,53 @@ Actualizaremos el **README** (parámetros, reproducibilidad) y elaboraremos **Sp
 - GPT-3.5-turbo 96% más económico que GPT-4 con resultados similares
 
 ---
+
+## Cambios Técnicos Implementados (S2-02)
+
+**Fecha:** 23 noviembre 2025
+
+**Parametrización de temperaturas y seeds para MAMV:**
+
+**Configuración actualizada (`configs/model.yaml`):**
+```yaml
+# S2-02: Temperature jitter for MAMV (3 instances)
+thesis:
+  temperature: 0.70  # Default single temperature
+  temperatures: [0.65, 0.70, 0.75]  # Jitter for MAMV instances
+
+# MAMV (Majority Voting Multiple Instances) Configuration
+mamv:
+  enabled: false  # Set to true to enable MAMV mode
+  num_instances: 3  # Number of parallel T-A-S instances
+  seeds: [101, 202, 303]  # Random seeds for each instance
+  voting_strategy: "majority"  # majority | unanimous | weighted
+```
+
+**Métodos nuevos en `src/utils/config.py`:**
+- `get_thesis_temperatures()`: Retorna array de temperaturas `[0.65, 0.70, 0.75]` para MAMV
+- `is_mamv_enabled()`: Verifica si MAMV está habilitado (default: false)
+- `get_mamv_num_instances()`: Retorna número de instancias (default: 3)
+- `get_mamv_seeds()`: Retorna seeds `[101, 202, 303]` para cada instancia
+- `get_mamv_voting_strategy()`: Retorna estrategia de votación (default: "majority")
+
+**Tests creados (`tests/test_s2_02_config.py`):**
+- 9 tests unitarios validando lectura de configuración MAMV
+- Verificación de fallback a temperatura única si no hay array configurado
+- Validación de backwards compatibility con código S1
+- Test integral de criterios de aceptación S2-02
+
+**Resultados:**
+- ✅ 9 nuevos tests pasando
+- ✅ 138 tests totales pasando (todos los tests existentes + S2-02)
+- ✅ Configuración backwards-compatible con código S1
+- ✅ Preparación completa para S2-03 (implementación MAMV)
+
+**Estado de dependencias:**
+- **S2-02 COMPLETADA** ✅ - Desbloquea S2-03
+- **S2-03:** Puede comenzar (implementación `synthesis_mamv()`)
+- **S2-06:** Requiere S2-03 completada (S2-05 ya ✅)
+
+---
 # Sprint 3 - Generalización + Debate
 
 Fechas: 3–9 nov 2025

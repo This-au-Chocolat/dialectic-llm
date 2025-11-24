@@ -2,6 +2,8 @@
 # Temperatures for each phase of the dialectic process
 thesis:
   temperature: 0.70  # High creativity for initial exploration
+  # S2-02: Temperature jitter for MAMV (3 instances)
+  temperatures: [0.65, 0.70, 0.75]
 
 antithesis:
   temperature: 0.50  # Moderate for balanced critical analysis
@@ -12,6 +14,13 @@ synthesis:
 # T-A-S Parameters
 tas:
   k: 1  # Number of iterations (k=1 for S1-07)
+
+# MAMV (Majority Voting Multiple Instances) Configuration - S2-02/S2-03
+mamv:
+  enabled: false  # Set to true to enable MAMV mode
+  num_instances: 3  # Number of parallel T-A-S instances
+  seeds: [101, 202, 303]  # Random seeds for each instance
+  voting_strategy: "majority"  # majority | unanimous | weighted
 
 # Model Configuration
 models:

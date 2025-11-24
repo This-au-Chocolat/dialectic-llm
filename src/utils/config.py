@@ -159,6 +159,18 @@ class TASConfig:
         """Get synthesis temperature."""
         return self.get_temperature("synthesis")
 
+    # S2-02: MAMV temperature jitter support
+    def get_thesis_temperatures(self) -> list[float]:
+        """
+        Get list of thesis temperatures for MAMV instances.
+        Falls back to single temperature if jitter not configured.
+        """
+        temps = self._config.get("thesis", {}).get("temperatures", None)
+        if temps is None:
+            # Fallback to single temperature
+            return [self.get_thesis_temperature()]
+        return temps
+
     # Model configuration
     def get_primary_model(self) -> str:
         """Get primary model name."""
@@ -202,6 +214,23 @@ class TASConfig:
     def should_track_sessions(self) -> bool:
         """Check if sessions should be tracked."""
         return self._config.get("logging", {}).get("session_tracking", True)
+
+    # S2-02/S2-03: MAMV configuration getters
+    def is_mamv_enabled(self) -> bool:
+        """Check if MAMV (Majority Voting Multiple Instances) is enabled."""
+        return self._config.get("mamv", {}).get("enabled", False)
+
+    def get_mamv_num_instances(self) -> int:
+        """Get number of parallel instances for MAMV."""
+        return self._config.get("mamv", {}).get("num_instances", 3)
+
+    def get_mamv_seeds(self) -> list[int]:
+        """Get random seeds for MAMV instances."""
+        return self._config.get("mamv", {}).get("seeds", [101, 202, 303])
+
+    def get_mamv_voting_strategy(self) -> str:
+        """Get MAMV voting strategy (majority, unanimous, weighted)."""
+        return self._config.get("mamv", {}).get("voting_strategy", "majority")
 
     def get_all_config(self) -> Dict[str, Any]:
         """Get the complete configuration."""
