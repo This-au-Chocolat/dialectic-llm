@@ -194,6 +194,111 @@ def make_prompt_synthesis(problem: str, thesis_answer: str, critique: str) -> st
 
 
 # -------------------------------
+# S2-03: MAMV (Majority Voting Multiple Instances) utilities
+# -------------------------------
+
+
+def extract_numeric_answer(text: str) -> Optional[str]:
+    """
+    Extract numeric answer from synthesis text.
+
+    Args:
+        text: Synthesis response text
+
+    Returns:
+        Extracted numeric answer or None if not found
+    """
+    from llm.client import extract_gsm8k_answer
+
+    answer = extract_gsm8k_answer(text)
+
+    # Filter out empty strings and non-numeric values
+    if not answer or answer.strip() == "" or answer.strip() == ".":
+        return None
+
+    # Filter out answers that are just punctuation or spaces
+    import re
+
+    if not re.search(r"\d", answer):
+        return None
+
+    return answer
+
+
+def majority_vote(
+    answers: List[str], temperatures: List[float], seeds: List[int]
+) -> Dict[str, Any]:
+    """
+    Apply majority voting to multiple synthesis answers.
+
+    Args:
+        answers: List of synthesis text responses
+        temperatures: List of temperatures used for each instance
+        seeds: List of seeds used for each instance
+
+    Returns:
+        Dictionary with:
+        - final_answer: The winning answer by majority vote
+        - votes: List of individual votes with metadata
+        - vote_counts: Dictionary of answer -> count
+        - decision_method: How the decision was made
+    """
+    # Extract numeric answers
+    numeric_answers = []
+    for i, answer_text in enumerate(answers):
+        extracted = extract_numeric_answer(answer_text)
+        numeric_answers.append(
+            {
+                "instance": i,
+                "temperature": temperatures[i],
+                "seed": seeds[i],
+                "raw_text": answer_text,
+                "extracted_answer": extracted,
+            }
+        )
+
+    # Count votes (exclude None values)
+    from collections import Counter
+
+    valid_votes = [
+        v["extracted_answer"] for v in numeric_answers if v["extracted_answer"] is not None
+    ]
+    vote_counts = Counter(valid_votes)
+
+    # Determine winner by majority
+    if not vote_counts:
+        # No valid answers extracted
+        return {
+            "final_answer": None,
+            "votes": numeric_answers,
+            "vote_counts": {},
+            "decision_method": "no_valid_answers",
+        }
+
+    # Get most common answer(s)
+    most_common = vote_counts.most_common()
+    max_votes = most_common[0][1]
+
+    if max_votes >= 2:
+        # Clear majority (2 or 3 votes)
+        final_answer = most_common[0][0]
+        decision_method = f"majority_{max_votes}_of_3"
+    else:
+        # Triple tie - use default temperature (0.70) instance
+        # Find instance with temperature closest to 0.70
+        default_instance = min(numeric_answers, key=lambda x: abs(x["temperature"] - 0.70))
+        final_answer = default_instance["extracted_answer"]
+        decision_method = "tie_break_default_temp"
+
+    return {
+        "final_answer": final_answer,
+        "votes": numeric_answers,
+        "vote_counts": dict(vote_counts),
+        "decision_method": decision_method,
+    }
+
+
+# -------------------------------
 # Tareas Prefect (con retries/backoff + rate-limit awareness)
 # S2-01: Enhanced retry logic with exponential backoff and jitter
 # -------------------------------
@@ -375,6 +480,148 @@ def run_tas_k1(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, An
         "thesis": t_future.result(),
         "antithesis": a_future.result(),
         "synthesis": s_future.result(),
+    }
+
+
+# -------------------------------
+# S2-03: MAMV Flow (Multiple Instances with Majority Voting)
+# -------------------------------
+
+
+@task(
+    retries=3,
+    retry_delay_seconds=get_prefect_retry_delays(max_retries=3, base_delay=1.0),
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(minutes=10),
+)
+def thesis_with_temp(
+    item: Any, temperature: float, instance_seed: int, flow_config: TASFlowConfig = flow_cfg
+) -> Dict[str, Any]:
+    """
+    Thesis task with custom temperature for MAMV instances.
+
+    Args:
+        item: Problem to solve
+        temperature: Custom temperature for this instance
+        instance_seed: Seed for this specific instance
+        flow_config: Flow configuration
+
+    Returns:
+        Thesis result dictionary
+    """
+    logger = get_run_logger()
+    prompt = make_prompt_thesis(item)
+    prompt_h = hash_prompt(prompt)
+
+    resp = llm_call(
+        prompt,
+        temperature=temperature,
+        model=config.get_primary_model(),
+        max_tokens=config.get_max_tokens_per_phase(),
+        logger=logger,
+    )
+    answer = resp["text"]
+
+    event_public = {
+        "run_id": flow_config.run_id,
+        "problem_id": item.get("problem_id"),
+        "stage": "thesis",
+        "dataset": flow_config.dataset_name,
+        "model": flow_config.model_name,
+        "temperature": temperature,
+        "seed": instance_seed,
+        "instance_seed": instance_seed,  # Track MAMV instance
+        "prompt_hash": prompt_h,
+        "response_hash": hash_response(answer),
+        "usage": resp["usage"],
+        "ts": time.time(),
+    }
+    event_local = {**event_public, "prompt": prompt, "answer": answer, "raw": resp["raw"]}
+
+    log_tas_event(event_local, local=True)
+    public_copy = {**event_public, "answer_preview": sanitize_for_public(answer)[:280]}
+    log_tas_event(public_copy, local=False)
+
+    logger.info(f"Thesis (T={temperature}, seed={instance_seed}) done.")
+    problem_text = item if isinstance(item, str) else item.get("question", str(item))
+    return {
+        "answer": answer,
+        "meta": event_public,
+        "problem_id": item.get("problem_id") if isinstance(item, dict) else None,
+        "problem": problem_text,
+        "temperature": temperature,
+        "instance_seed": instance_seed,
+    }
+
+
+@flow(name="tas_k1_mamv")
+def run_tas_mamv(item: Any, flow_config: TASFlowConfig = flow_cfg) -> Dict[str, Any]:
+    """
+    Execute T-A-S with MAMV (3 parallel instances with different temperatures).
+
+    S2-03: Implements Majority Voting Multiple Instances pattern.
+
+    Args:
+        item: Problem to solve (str or dict with 'question')
+        flow_config: Flow configuration
+
+    Returns:
+        Dictionary with:
+        - instances: List of 3 T-A-S results (one per temperature)
+        - mamv_result: Majority voting result with final answer
+        - final_answer: The consensus answer
+    """
+    logger = get_run_logger()
+
+    # Get MAMV configuration
+    temperatures = config.get_thesis_temperatures()
+    seeds = config.get_mamv_seeds()
+
+    logger.info(f"🗳️  Running MAMV with temperatures: {temperatures}, seeds: {seeds}")
+
+    # Run 3 parallel T-A-S instances with different temperatures
+    instances = []
+    for i, (temp, seed) in enumerate(zip(temperatures, seeds)):
+        logger.info(f"  Instance {i}: T={temp}, seed={seed}")
+
+        # Create custom flow config for this instance
+        instance_config = TASFlowConfig(
+            seed=seed,
+            dataset_name=flow_config.dataset_name,
+            model_name=flow_config.model_name,
+            run_id=f"{flow_config.run_id}_inst{i}",
+        )
+
+        # Execute custom thesis with specific temperature
+        t_future = thesis_with_temp.submit(item, temp, seed, instance_config)
+        a_future = antithesis.submit(t_future, instance_config)
+        s_future = synthesis.submit(t_future, a_future, instance_config)
+
+        # Collect result
+        instance_result = {
+            "instance_id": i,
+            "temperature": temp,
+            "seed": seed,
+            "thesis": t_future.result(),
+            "antithesis": a_future.result(),
+            "synthesis": s_future.result(),
+        }
+        instances.append(instance_result)
+
+    # Extract synthesis answers for voting
+    synthesis_answers = [inst["synthesis"]["answer"] for inst in instances]
+
+    # Apply majority voting
+    mamv_result = majority_vote(synthesis_answers, temperatures, seeds)
+
+    logger.info(f"✅ MAMV decision: {mamv_result['decision_method']}")
+    logger.info(f"   Final answer: {mamv_result['final_answer']}")
+
+    return {
+        "instances": instances,
+        "mamv_result": mamv_result,
+        "final_answer": mamv_result["final_answer"],
+        "decision_method": mamv_result["decision_method"],
     }
 
 

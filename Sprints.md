@@ -261,6 +261,78 @@ mamv:
 - **S2-06:** Requiere S2-03 completada (S2-05 ya ✅)
 
 ---
+
+## Cambios Técnicos Implementados (S2-03)
+
+**Fecha:** 23 noviembre 2025
+
+**Implementación de MAMV (Majority Voting Multiple Instances):**
+
+**Nuevas funciones en `src/flows/tas.py`:**
+
+1. **`extract_numeric_answer(text: str) -> Optional[str]`**
+   - Extrae respuesta numérica de texto de síntesis
+   - Filtra valores vacíos, puntuación y no-numéricos
+   - Retorna `None` si no encuentra respuesta válida
+
+2. **`majority_vote(answers, temperatures, seeds) -> Dict[str, Any]`**
+   - Aplica votación por mayoría simple a 3 respuestas
+   - **Casos manejados:**
+     - Unanimidad (3 de 3): retorna respuesta común
+     - Mayoría (2 de 3): retorna respuesta mayoritaria
+     - Empate triple (1-1-1): usa respuesta de instancia con T=0.70 (default)
+     - Sin respuestas válidas: retorna None con `decision_method="no_valid_answers"`
+   - **Retorna:** decision final + votos individuales + conteos + método de decisión
+
+3. **`thesis_with_temp(item, temperature, instance_seed, flow_config) -> Dict[str, Any]`**
+   - Variante de thesis() con temperatura personalizada
+   - Incluye tracking de `instance_seed` en metadata
+   - Logging completo con temperatura y seed de instancia
+
+4. **`run_tas_mamv(item, flow_config) -> Dict[str, Any]`**
+   - Flow principal de MAMV (Prefect)
+   - Ejecuta 3 instancias paralelas de T-A-S con:
+     - Temperaturas: [0.65, 0.70, 0.75]
+     - Seeds: [101, 202, 303]
+   - Recolecta resultados de síntesis de cada instancia
+   - Aplica votación por mayoría
+   - **Retorna:**
+     - `instances`: Lista de 3 resultados T-A-S completos
+     - `mamv_result`: Resultado de votación con trazabilidad
+     - `final_answer`: Respuesta de consenso
+     - `decision_method`: Cómo se tomó la decisión
+
+**Tests creados (`tests/test_s2_03_mamv.py`):**
+- 12 tests unitarios validando:
+  - ✅ Votación unánime (3 de 3)
+  - ✅ Mayoría simple (2 de 3)
+  - ✅ Desempate por temperatura default
+  - ✅ Trazabilidad de votos (instance, temperature, seed, answer)
+  - ✅ Manejo de respuestas inválidas
+  - ✅ Extracción de respuestas numéricas
+  - ✅ Casos de respuestas parcialmente válidas
+  - ✅ Criterios de aceptación S2-03
+
+**Resultados:**
+- ✅ **150 tests pasando** (12 nuevos MAMV + 138 existentes)
+- ✅ `majority_vote()` retorna decisión + votos completos (aceptación S2-03)
+- ✅ Trazabilidad completa de cada instancia con metadata
+- ✅ Desempate robusto usando temperatura default 0.70
+- ✅ Manejo de casos edge (sin respuestas, respuestas parciales)
+
+**Características implementadas:**
+- **Ejecución paralela:** 3 instancias T-A-S con diferentes temperaturas
+- **Votación robusta:** Mayoría simple con tie-breaking inteligente
+- **Trazabilidad completa:** Cada voto incluye instance_id, temperature, seed, raw_text, extracted_answer
+- **Logging granular:** Cada instancia logea con su propia temperatura y seed
+- **Configuración flexible:** Lee temperaturas y seeds de `configs/model.yaml` (S2-02)
+
+**Estado de dependencias:**
+- **S2-03 COMPLETADA** ✅ - Desbloquea S2-06 y S2-13
+- **S2-06:** Puede comenzar (ejecutar T-A-S+MAMV en ≥200 problemas)
+- **S2-13:** Puede comenzar (unit tests MAMV/jitter - ya ✅ con S2-03)
+
+---
 # Sprint 3 - Generalización + Debate
 
 Fechas: 3–9 nov 2025
