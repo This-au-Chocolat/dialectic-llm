@@ -67,6 +67,8 @@ def estimate_cost(token_counts: Dict[str, int], model: str = "gpt-4") -> float:
         "gpt-4": {"prompt": 0.03, "completion": 0.06},
         "gpt-4-turbo": {"prompt": 0.01, "completion": 0.03},
         "gpt-3.5-turbo": {"prompt": 0.0015, "completion": 0.002},
+        "deepseek-chat": {"prompt": 0.00014, "completion": 0.00028},
+        "deepseek-coder": {"prompt": 0.00014, "completion": 0.00028},
     }
 
     # Default to gpt-4 pricing if model not found

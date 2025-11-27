@@ -1,0 +1,17 @@
+{
+  "run_id": "s2_tas_deepseek_k1_20251126_013817",
+  "timestamp": "2025-11-26T02:51:37.505073",
+  "total_problems": 50,
+  "valid_results": 50,
+  "correct": 0,
+  "accuracy": 0.0,
+  "total_tokens": 250232,
+  "total_cost_usd": 0.08390844,
+  "avg_coherence": 0.8654692375659943,
+  "budget_status": {
+    "budget_limit": 1.0,
+    "budget_used_pct": 8.390844,
+    "projected_total": 0.08390844,
+    "items_over_cap": 0
+  }
+}

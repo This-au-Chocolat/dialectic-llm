@@ -24,8 +24,8 @@ mamv:
 
 # Model Configuration
 models:
-  primary: "gpt-3.5-turbo"  # Cambiado de gpt-4 para reducir costos
-  fallback: "gpt-3.5-turbo"
+  primary: "deepseek-chat"
+  fallback: "deepseek-chat"
   embeddings: "text-embedding-3-small"
 
 # Token Limits and Controls

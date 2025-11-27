@@ -208,8 +208,24 @@ def extract_numeric_answer(text: str) -> Optional[str]:
     Returns:
         Extracted numeric answer or None if not found
     """
+    import re
+
     from llm.client import extract_gsm8k_answer
 
+    # First try: Look for **FINAL ANSWER:** pattern (new synthesis format)
+    final_answer_match = re.search(r"\*\*FINAL ANSWER:\*\*\s*(.+?)(?:\n|$)", text, re.IGNORECASE)
+    if final_answer_match:
+        answer_text = final_answer_match.group(1).strip()
+        # Extract numeric value from the answer text
+        number_match = re.search(r"[\d,]+(?:\.\d+)?", answer_text)
+        if number_match:
+            answer = number_match.group(0).strip()
+            # Clean up commas
+            answer = answer.replace(",", "")
+            if answer and re.search(r"\d", answer):
+                return answer
+
+    # Second try: Use standard GSM8K extraction (looks for #### pattern)
     answer = extract_gsm8k_answer(text)
 
     # Filter out empty strings and non-numeric values
@@ -217,8 +233,6 @@ def extract_numeric_answer(text: str) -> Optional[str]:
         return None
 
     # Filter out answers that are just punctuation or spaces
-    import re
-
     if not re.search(r"\d", answer):
         return None
 

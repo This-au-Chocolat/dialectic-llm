@@ -1,4 +1,4 @@
-"""OpenAI client wrapper for baseline and dialectic calls."""
+"""LLM client wrapper for OpenAI and DeepSeek API calls."""
 
 import os
 from typing import Any, Dict, Optional
@@ -9,20 +9,55 @@ from openai import OpenAI
 class LLMClient:
     """Client for making LLM calls with consistent interface."""
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4"):
+    def __init__(
+        self, api_key: Optional[str] = None, model: str = "gpt-4", base_url: Optional[str] = None
+    ):
         """
         Initialize the LLM client.
 
         Args:
-            api_key: OpenAI API key (if None, reads from OPENAI_API_KEY env var)
+            api_key: API key (if None, reads from DEEPSEEK_API_KEY or OPENAI_API_KEY env var)
             model: Default model to use
+            base_url: Base URL for API (use "https://api.deepseek.com" for DeepSeek)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise ValueError("OpenAI API key is required. Set OPENAI_API_KEY environment variable.")
+        # Auto-detect provider based on model or use explicit base_url
+        if base_url is None:
+            if model and "deepseek" in model.lower():
+                base_url = "https://api.deepseek.com"
+                self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
+                if not self.api_key:
+                    raise ValueError(
+                        "DeepSeek API key is required. Set DEEPSEEK_API_KEY environment variable."
+                    )
+            else:
+                self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+                if not self.api_key:
+                    raise ValueError(
+                        "OpenAI API key is required. Set OPENAI_API_KEY environment variable."
+                    )
+        else:
+            # Explicit base_url provided
+            if "deepseek" in base_url.lower():
+                self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
+                if not self.api_key:
+                    raise ValueError(
+                        "DeepSeek API key is required. Set DEEPSEEK_API_KEY environment variable."
+                    )
+            else:
+                self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+                if not self.api_key:
+                    raise ValueError(
+                        "OpenAI API key is required. Set OPENAI_API_KEY environment variable."
+                    )
 
-        self.client = OpenAI(api_key=self.api_key)
+        # Initialize client with optional base_url
+        if base_url:
+            self.client = OpenAI(api_key=self.api_key, base_url=base_url)
+        else:
+            self.client = OpenAI(api_key=self.api_key)
+
         self.default_model = model
+        self.base_url = base_url
 
     def call(
         self,
