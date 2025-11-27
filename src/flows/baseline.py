@@ -63,7 +63,7 @@ def _create_mock_response(question: str, expected_answer: float) -> Dict[str, An
     }
 
 
-@task(name="solve_baseline_problem")
+@task(name="solve_baseline_problem", cache_policy=None)
 def solve_baseline_problem(
     problem: Dict[str, Any],
     run_id: str,
