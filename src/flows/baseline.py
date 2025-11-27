@@ -153,7 +153,7 @@ def create_results_parquet_task(results: List[Dict[str, Any]], run_id: str) -> s
 
 @flow(name="baseline_gsm8k_flow", log_prints=True)
 def run_baseline_gsm8k(
-    n_problems: int = 200,
+    n_problems: int = 50,
     seed: int = 42,
     model: str = "gpt-4",
     run_id: Optional[str] = None,
