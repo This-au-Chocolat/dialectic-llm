@@ -1,188 +1,191 @@
-
 import argparse
-import pandas as pd
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pandas as pd
 from statsmodels.stats.contingency_tables import mcnemar
-import numpy as np
 
 # Add src to the Python path to allow for absolute imports
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-def create_contingency_table(df: pd.DataFrame, col1: str, col2: str) -> np.ndarray:
-    """Creates a 2x2 contingency table for McNemar's test."""
-    true_true = ((df[col1] == True) & (df[col2] == True)).sum()
-    true_false = ((df[col1] == True) & (df[col2] == False)).sum()
-    false_true = ((df[col1] == False) & (df[col2] == True)).sum()
-    false_false = ((df[col1] == False) & (df[col2] == False)).sum()
-    return np.array([[true_true, true_false], [false_true, false_false]])
 
+def load_data(file_path, model_name):
+    """Loads parquet data and standardizes columns."""
+    df = pd.read_parquet(file_path)
 
-def calculate_metrics_for_run(
-    baseline_path: str, tas_path: str, mamv_path: str, output_parquet_name: str = "metrics_s2.parquet"
-):
-    """
-    Reads baseline, T-A-S, and T-A-S+MAMV results, validates them, calculates
-    McNemar's test, Delta Accuracy, and token usage, then saves to a parquet
-    file and prints a markdown table.
-    """
-    try:
-        baseline_df = pd.read_parquet(baseline_path)
-        tas_df = pd.read_parquet(tas_path)
-        mamv_df = pd.read_parquet(mamv_path)
-    except FileNotFoundError as e:
-        print(f"Error: Could not find one of the input files. {e}")
-        sys.exit(1)
+    if df.empty:
+        raise ValueError(f"File {file_path} is empty.")
 
-    # --- Validation Step ---
-    print("Validating input files...")
-    required_cols = ["problem_id", "is_correct", "total_tokens"]
-    for df, name in zip([baseline_df, tas_df, mamv_df], ["Baseline", "T-A-S", "MAMV"]):
-        if not all(col in df.columns for col in required_cols):
-            print(f"Error: {name} file must contain the columns: {required_cols}")
-            sys.exit(1)
+    # Check for 'is_correct' column
+    if "is_correct" not in df.columns:
+        raise ValueError(f"File {file_path} is missing 'is_correct' column.")
 
-    # Find common problem_ids
-    ids_base = set(baseline_df["problem_id"])
-    ids_tas = set(tas_df["problem_id"])
-    ids_mamv = set(mamv_df["problem_id"])
-    common_ids = ids_base.intersection(ids_tas).intersection(ids_mamv)
+    # Check for 'problem_id' column
+    if "problem_id" not in df.columns:
+        raise ValueError(f"File {file_path} is missing 'problem_id' column.")
 
-    if len(common_ids) < 10:  # Set a reasonable threshold
-        print(f"Error: Found only {len(common_ids)} common problems across the three files.")
-        print("Please ensure the Parquet files correspond to the same set of problems.")
-        sys.exit(1)
-
-    print(f"Found {len(common_ids)} common problems. Proceeding with analysis...")
-
-    # Filter dataframes to only common problems
-    baseline_df = baseline_df[baseline_df["problem_id"].isin(common_ids)].copy()
-    tas_df = tas_df[tas_df["problem_id"].isin(common_ids)].copy()
-    mamv_df = mamv_df[mamv_df["problem_id"].isin(common_ids)].copy()
-
-    # --- Merge DataFrames ---
-    merged_df = baseline_df.set_index("problem_id").join(
-        tas_df.set_index("problem_id"), lsuffix="_base", rsuffix="_tas"
-    ).join(
-        mamv_df.set_index("problem_id"), rsuffix="_mamv"
+    # Standardize 'is_correct' and 'problem_id' names
+    df.rename(
+        columns={
+            "is_correct": f"is_correct_{model_name}",
+            "problem_id": f"problem_id_{model_name}",
+        },
+        inplace=True,
     )
 
-    # Clean up column names after joins
-    merged_df = merged_df.rename(columns={
-        "is_correct": "is_correct_mamv",
-        "total_tokens": "total_tokens_mamv",
-    })
+    # --- Standardize 'total_tokens' ---
+    # The logic here dynamically finds the token column, as its name differs between scripts.
+    token_col_name = None
+    if "total_tokens" in df.columns:  # This column might exist directly
+        token_col_name = "total_tokens"
+    elif "llm_usage" in df.columns:  # For baseline
+        token_col_name = "llm_usage"
+    elif "tas_usage" in df.columns:  # For tas_k1
+        token_col_name = "tas_usage"
+    elif "mamv_usage" in df.columns:  # For mamv
+        token_col_name = "mamv_usage"
 
-
-    # --- Accuracy and Delta Accuracy ---
-    acc_base = merged_df["is_correct_base"].mean()
-    acc_tas = merged_df["is_correct_tas"].mean()
-    acc_mamv = merged_df["is_correct_mamv"].mean()
-
-    delta_acc_tas_vs_base = acc_tas - acc_base
-    delta_acc_mamv_vs_base = acc_mamv - acc_base
-
-    # --- Token Usage ---
-    tokens_base = merged_df["total_tokens_base"].mean()
-    tokens_tas = merged_df["total_tokens_tas"].mean()
-    tokens_mamv = merged_df["total_tokens_mamv"].mean()
-
-    # --- McNemar's Test ---
-    # Baseline vs T-A-S
-    contingency_table_tas = create_contingency_table(merged_df, "is_correct_base", "is_correct_tas")
-    mcnemar_result_tas = mcnemar(contingency_table_tas, exact=False)
-    p_value_tas_vs_base = mcnemar_result_tas.pvalue
-
-    # Baseline vs T-A-S+MAMV
-    contingency_table_mamv = create_contingency_table(merged_df, "is_correct_base", "is_correct_mamv")
-    mcnemar_result_mamv = mcnemar(contingency_table_mamv, exact=False)
-    p_value_mamv_vs_base = mcnemar_result_mamv.pvalue
-
-
-    # --- Create metrics_s2.parquet ---
-    metrics_data = {
-        "metric": [
-            "Accuracy_Baseline", "Accuracy_TAS", "Accuracy_MAMV",
-            "Delta_Acc_TAS_vs_Base", "Delta_Acc_MAMV_vs_Base",
-            "Avg_Tokens_Baseline", "Avg_Tokens_TAS", "Avg_Tokens_MAMV",
-            "P_Value_McNemar_TAS_vs_Base", "P_Value_McNemar_MAMV_vs_Base",
-            "N_Common_Problems",
-        ],
-        "value": [
-            acc_base, acc_tas, acc_mamv,
-            delta_acc_tas_vs_base, delta_acc_mamv_vs_base,
-            tokens_base, tokens_tas, tokens_mamv,
-            p_value_tas_vs_base, p_value_mamv_vs_base,
-            len(common_ids),
-        ],
-    }
-    metrics_df = pd.DataFrame(metrics_data)
-
-    output_dir = Path("analytics/parquet")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / output_parquet_name
-    metrics_df.to_parquet(output_path, index=False)
-    print(f"\nMetrics saved to {output_path}")
-
-    # --- Print Markdown Table and Interpretation ---
-    print("\n# S2-10: McNemar y KPIs Reporte")
-    print("\n## Resumen de Métricas")
-    print(f"(Basado en N={len(common_ids)} problemas en común)")
-    print("| Métrica                     | Baseline  | T-A-S     | T-A-S+MAMV |")
-    print("| :-------------------------- | :-------- | :-------- | :--------- |")
-    print(f"| Precisión (Accuracy)        | {acc_base:.3f}    | {acc_tas:.3f}    | {acc_mamv:.3f}   |")
-    print(f"| Δ Precisión (vs Baseline)   | -         | {delta_acc_tas_vs_base:+.3f}   | {delta_acc_mamv_vs_base:+.3f}  |")
-    print(f"| P-Value (McNemar vs Base)   | -         | {p_value_tas_vs_base:.4f}  | {p_value_mamv_vs_base:.4f} |")
-    print(f"| Tokens Promedio por Ítem    | {tokens_base:,.0f} | {tokens_tas:,.0f} | {tokens_mamv:,.0f} |")
-
-    print("\n## Interpretación")
-    if p_value_tas_vs_base < 0.05:
-        tas_significance = f"la mejora de {(delta_acc_tas_vs_base * 100):.1f}pp es **estadísticamente significativa**"
+    if token_col_name:
+        if isinstance(df[token_col_name].iloc[0], dict):
+            df[f"total_tokens_{model_name}"] = df[token_col_name].apply(
+                lambda x: x.get("total_tokens", 0)
+            )
+        else:  # Assume it's already the total tokens if not a dict
+            df[f"total_tokens_{model_name}"] = df[token_col_name]
     else:
-        tas_significance = f"la diferencia de {(delta_acc_tas_vs_base * 100):.1f}pp **no es estadísticamente significativa**"
+        # Fallback if no specific usage column is found
+        df[f"total_tokens_{model_name}"] = 0
+        print(
+            f"Warning: No specific token usage column found in {file_path}. Defaulting to 0."
+        )
 
-    if p_value_mamv_vs_base < 0.05:
-        mamv_significance = f"la mejora de {(delta_acc_mamv_vs_base * 100):.1f}pp es **estadísticamente significativa**"
-    else:
-        mamv_significance = f"la diferencia de {(delta_acc_mamv_vs_base * 100):.1f}pp **no es estadísticamente significativa**"
+    return df[
+        [f"problem_id_{model_name}", f"is_correct_{model_name}", f"total_tokens_{model_name}"]
+    ]
 
-    print(f"- El enfoque T-A-S ({acc_tas:.3f}) muestra un cambio de {delta_acc_tas_vs_base:+.3f} en precisión sobre el Baseline ({acc_base:.3f}). Con un p-valor de {p_value_tas_vs_base:.4f}, {tas_significance}.")
-    print(f"- El enfoque T-A-S+MAMV ({acc_mamv:.3f}) muestra un cambio de {delta_acc_mamv_vs_base:+.3f} en precisión sobre el Baseline. Con un p-valor de {p_value_mamv_vs_base:.4f}, {mamv_significance}.")
-    print(f"- En términos de costo, T-A-S consume un promedio de {tokens_tas:,.0f} tokens, mientras que MAMV consume {tokens_mamv:,.0f}, comparado con los {tokens_base:,.0f} del Baseline.")
 
-if __name__ == "__main__":
+def calculate_mcnemar(df, col1, col2):
+    """Calculates McNemar's test and returns p-value."""
+    contingency_table = pd.crosstab(df[col1], df[col2])
+
+    # Ensure the table is 2x2, filling with 0 if necessary
+    if True not in contingency_table.index:
+        contingency_table.loc[True] = 0
+    if False not in contingency_table.index:
+        contingency_table.loc[False] = 0
+    if True not in contingency_table.columns:
+        contingency_table[True] = 0
+    if False not in contingency_table.columns:
+        contingency_table[False] = 0
+
+    # Sort to ensure consistent (False, True) order
+    contingency_table = contingency_table.sort_index(axis=0).sort_index(axis=1)
+
+    result = mcnemar(contingency_table, exact=False, correction=True)
+    return result.pvalue
+
+
+def main():
     parser = argparse.ArgumentParser(
-        description="Perform McNemar's test and KPI comparison for T-A-S models."
+        description="Perform McNemar's test and KPI analysis for S2-10."
     )
-    parser.add_argument(
-        "--baseline",
-        type=str,
-        required=True,
-        help="Path to the Baseline Parquet file.",
-    )
-    parser.add_argument(
-        "--tas",
-        type=str,
-        required=True,
-        help="Path to the T-A-S Parquet file.",
-    )
-    parser.add_argument(
-        "--mamv",
-        type=str,
-        required=True,
-        help="Path to the T-A-S+MAMV Parquet file.",
-    )
-    parser.add_argument(
-        "--output-name",
-        type=str,
-        default="metrics_s2.parquet",
-        help="Name for the output Parquet file (e.g., metrics_s2.parquet).",
-    )
+    parser.add_argument("baseline_file", type=str, help="Path to Baseline Parquet file.")
+    parser.add_argument("tas_file", type=str, help="Path to T-A-S Parquet file.")
+    parser.add_argument("mamv_file", type=str, help="Path to T-A-S+MAMV Parquet file.")
     args = parser.parse_args()
 
-    calculate_metrics_for_run(
-        baseline_path=args.baseline,
-        tas_path=args.tas,
-        mamv_path=args.mamv,
-        output_parquet_name=args.output_name,
+    # Load data
+    print("Loading and standardizing data...")
+    try:
+        df_baseline_raw = load_data(args.baseline_file, "baseline")
+        df_tas_raw = load_data(args.tas_file, "tas")
+        df_mamv_raw = load_data(args.mamv_file, "mamv")
+    except ValueError as e:
+        print(f"\n❌ Error loading data: {e}")
+        sys.exit(1)
+
+    # Ensure all dataframes are sorted by their generated problem_id to ensure consistent order
+    # (assuming problem_id 'gsm8k_0000', 'gsm8k_0001' maps to original problems in order)
+    df_baseline_raw = df_baseline_raw.sort_values(by="problem_id_baseline").reset_index(drop=True)
+    df_tas_raw = df_tas_raw.sort_values(by="problem_id_tas").reset_index(drop=True)
+    df_mamv_raw = df_mamv_raw.sort_values(by="problem_id_mamv").reset_index(drop=True)
+
+    # Extract problem_id from T-A-S, which has the correct IDs
+    master_problem_ids = df_tas_raw["problem_id_tas"]
+
+    # Drop problem_id columns from the raw DFs before joining on index, as they are inconsistent
+    df_baseline_processed = df_baseline_raw.drop(columns=["problem_id_baseline"])
+    df_tas_processed = df_tas_raw.drop(columns=["problem_id_tas"])
+    df_mamv_processed = df_mamv_raw.drop(columns=["problem_id_mamv"])
+
+    # Join dataframes based on index
+    print("Joining dataframes based on their index (assuming consistent order)...")
+    merged_df = df_baseline_processed.join(df_tas_processed, lsuffix="_b", rsuffix="_t")
+    merged_df = merged_df.join(df_mamv_processed, rsuffix="_m")
+
+    # Add the correct master problem_ids
+    merged_df["problem_id"] = master_problem_ids
+
+    # Ensure problem_id is the first column
+    cols = ["problem_id"] + [col for col in merged_df if col != "problem_id"]
+    merged_df = merged_df[cols]
+
+    if len(merged_df) == 0:
+        print("\n❌ Error: Merging resulted in an empty dataframe. Check file contents and paths.")
+        sys.exit(1)
+
+    print(f"Successfully loaded and merged data for {len(merged_df)} problems.")
+
+    # --- KPI Calculation ---
+    acc_baseline = merged_df["is_correct_baseline"].mean() * 100
+    acc_tas = merged_df["is_correct_tas"].mean() * 100
+    acc_mamv = merged_df["is_correct_mamv"].mean() * 100
+
+    tokens_baseline = merged_df["total_tokens_baseline"].sum()
+    tokens_tas = merged_df["total_tokens_tas"].sum()
+    tokens_mamv = merged_df["total_tokens_mamv"].sum()
+
+    # --- McNemar's Test ---
+    print("\nPerforming McNemar's tests...")
+    pvalue_tas_vs_baseline = calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_tas")
+    pvalue_mamv_vs_baseline = calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_mamv")
+
+    # --- Prepare results for Parquet and Markdown ---
+    kpis = {
+        "model": ["Baseline", "T-A-S (k=1)", "T-A-S+MAMV"],
+        "accuracy_pct": [acc_baseline, acc_tas, acc_mamv],
+        "delta_accuracy_vs_baseline_pct": [0, acc_tas - acc_baseline, acc_mamv - acc_baseline],
+        "pvalue_vs_baseline": [None, pvalue_tas_vs_baseline, pvalue_mamv_vs_baseline],
+        "total_tokens": [tokens_baseline, tokens_tas, tokens_mamv],
+    }
+    metrics_df = pd.DataFrame(kpis)
+
+    # --- Generate metrics_s2.parquet ---
+    output_parquet_path = Path("analytics/parquet/metrics_s2.parquet")
+    metrics_df.to_parquet(output_parquet_path, index=False)
+    print(f"\nMetrics saved to {output_parquet_path}")
+
+    # --- Generate Markdown Table for Sprint2.md ---
+    print("\n--- S2-10 KPI Results (for Sprint2.md) ---")
+
+    # For display purposes, format the dataframe to a string with desired precision
+    # This prevents pandas from using scientific notation for small p-values
+    md_df = metrics_df.copy()
+    md_df["accuracy_pct"] = md_df["accuracy_pct"].map("{:.2f}%".format)
+    md_df["delta_accuracy_vs_baseline_pct"] = md_df["delta_accuracy_vs_baseline_pct"].map(
+        "{:+.2f}%".format
     )
+    md_df["pvalue_vs_baseline"] = md_df["pvalue_vs_baseline"].map(
+        lambda p: f"{p:.4f}" if pd.notna(p) else "N/A"
+    )
+    md_df["total_tokens"] = md_df["total_tokens"].map("{:,}".format)
+
+    # Set the first row's delta/p-value to N/A
+    md_df.loc[0, "delta_accuracy_vs_baseline_pct"] = "N/A"
+    md_df.loc[0, "pvalue_vs_baseline"] = "N/A"
+
+    print(md_df.to_markdown(index=False))
+
+
+if __name__ == "__main__":
+    main()
