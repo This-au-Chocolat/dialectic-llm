@@ -15,39 +15,22 @@ Expected time: ~3 hours
 """
 
 import json
-
 import os
-
 import sys
-
 import time
-
 from datetime import datetime
-
 from pathlib import Path
 
+from dotenv import load_dotenv
 
-
-from dotenv import load_dotenv # <--- AÑADIR ESTA LÍNEA Y MOVER AQUÍ
-
-
-
-# Cargar variables de entorno desde .env
-
-load_dotenv() # <--- AÑADIR ESTA LÍNEA Y MOVER AQUÍ
-
-
-
-# Add src to path
-
+# Add src to path (must be before local imports)
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-
+# Cargar variables de entorno desde .env (after sys.path, before local imports)
+load_dotenv()
 
 from flows.tas import TASFlowConfig, run_tas_mamv
-
 from utils.data_utils import load_gsm8k_batch
-
 from utils.evaluation import coherence_ts, evaluate_exact_match
 
 # Configuration

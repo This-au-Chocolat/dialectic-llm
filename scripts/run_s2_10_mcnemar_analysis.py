@@ -55,9 +55,7 @@ def load_data(file_path, model_name):
     else:
         # Fallback if no specific usage column is found
         df[f"total_tokens_{model_name}"] = 0
-        print(
-            f"Warning: No specific token usage column found in {file_path}. Defaulting to 0."
-        )
+        print(f"Warning: No specific token usage column found in {file_path}. Defaulting to 0.")
 
     return df[
         [f"problem_id_{model_name}", f"is_correct_{model_name}", f"total_tokens_{model_name}"]

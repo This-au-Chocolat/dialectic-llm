@@ -1,7 +1,8 @@
-
 import argparse
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
 
 def inspect_parquet_files(file_paths):
     """
@@ -16,7 +17,7 @@ def inspect_parquet_files(file_paths):
             continue
 
         print(f"Inspecting file: {path.name}")
-        
+
         try:
             df = pd.read_parquet(path)
             print(f"  - Total rows: {len(df)}")
@@ -26,7 +27,7 @@ def inspect_parquet_files(file_paths):
                 print(f"  - First 5 problem_ids:\n{df['problem_id'].head().to_string(index=False)}")
             else:
                 print("  - 'problem_id' column not found.")
-            
+
             print("\n")
 
         except Exception as e:
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "files",
-        nargs='+',
+        nargs="+",
         type=str,
         help="One or more paths to Parquet files to inspect.",
     )
