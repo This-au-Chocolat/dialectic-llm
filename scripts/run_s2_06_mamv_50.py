@@ -1,17 +1,6 @@
 """
 S2-06: Execute T-A-S+MAMV on 50 GSM8K problems with DeepSeek.
-
-This script executes the MAMV (Majority Voting Multiple Instances) approach
-on 50 GSM8K problems using the same dataset as S2-05.
-
-MAMV Configuration:
-- 3 parallel T-A-S instances per problem
-- Temperatures: [0.65, 0.70, 0.75]
-- Seeds: [101, 202, 303]
-- Majority voting with tie-breaking
-
-Expected cost: ~$0.17 USD (DeepSeek pricing)
-Expected time: ~3 hours
+...
 """
 
 import json
@@ -23,15 +12,15 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from flows.tas import TASFlowConfig, run_tas_mamv
+from utils.data_utils import load_gsm8k_batch
+from utils.evaluation import coherence_ts, evaluate_exact_match
+
 # Add src to path (must be before local imports)
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 # Cargar variables de entorno desde .env (after sys.path, before local imports)
 load_dotenv()
-
-from flows.tas import TASFlowConfig, run_tas_mamv
-from utils.data_utils import load_gsm8k_batch
-from utils.evaluation import coherence_ts, evaluate_exact_match
 
 # Configuration
 SEED = 42
