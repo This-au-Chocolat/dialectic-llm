@@ -22,35 +22,36 @@ print("=" * 70)
 
 # 1. Verificar API key
 print("\n1️⃣  Checking API Key...")
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("DEEPSEEK_API_KEY")
 if not api_key:
-    print("   ❌ OPENAI_API_KEY not found in environment")
+    print("   ❌ DEEPSEEK_API_KEY not found in environment")
     sys.exit(1)
 else:
     print(f"   ✅ API Key found (length: {len(api_key)} chars)")
     print(f"   Key starts with: {api_key[:7]}...")
 
-# 2. Test OpenAI connection
-print("\n2️⃣  Testing OpenAI Connection...")
+# 2. Test DeepSeek connection
+print("\n2️⃣  Testing DeepSeek Connection...")
 try:
     from openai import OpenAI
 
-    client = OpenAI(api_key=api_key)
+    # Point client to DeepSeek endpoint
+    client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com/v1")
 
     # Hacer una llamada simple
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="deepseek-chat",
         messages=[{"role": "user", "content": "Say 'test successful' in exactly two words."}],
         max_tokens=10,
         temperature=0.0,
     )
 
     result = response.choices[0].message.content.strip()
-    print(f"   ✅ OpenAI API responding: '{result}'")
+    print(f"   ✅ DeepSeek API responding: '{result}'")
     print(f"   📊 Tokens used: {response.usage.total_tokens}")
 
 except Exception as e:
-    print(f"   ❌ Error connecting to OpenAI: {e}")
+    print(f"   ❌ Error connecting to DeepSeek: {e}")
     sys.exit(1)
 
 # 3. Test budget monitor
@@ -95,7 +96,7 @@ try:
         run_id="test-run",
         seed=42,
         dataset_name="gsm8k",
-        model_name="gpt-4",
+        model_name="deepseek-chat",
     )
 
     print(f"   Running T-A-S on: {test_problem['question'][:60]}...")
