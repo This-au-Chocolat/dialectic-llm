@@ -23,9 +23,19 @@ print("=" * 70)
 # 1. Verificar API key
 print("\n1️⃣  Checking API Key...")
 api_key = os.getenv("DEEPSEEK_API_KEY")
+is_ci_environment = os.getenv("CI", "false").lower() == "true"
+
 if not api_key:
-    print("   ❌ DEEPSEEK_API_KEY not found in environment")
-    sys.exit(1)
+    if is_ci_environment:
+        print("   ⚠️  DEEPSEEK_API_KEY not found. Skipping API-dependent checks in CI environment.")
+        # Exit gracefully in CI to allow other tests to run
+        print("\n" + "=" * 70)
+        print("✅ PRE-FLIGHT CHECK SKIPPED IN CI (NO API KEY)")
+        print("=" * 70)
+        sys.exit(0)
+    else:
+        print("   ❌ DEEPSEEK_API_KEY not found in local environment")
+        sys.exit(1)
 else:
     print(f"   ✅ API Key found (length: {len(api_key)} chars)")
     print(f"   Key starts with: {api_key[:7]}...")
