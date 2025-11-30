@@ -63,7 +63,7 @@ def _create_mock_response(question: str, expected_answer: float) -> Dict[str, An
     }
 
 
-@task(name="solve_baseline_problem")
+@task(name="solve_baseline_problem", cache_policy=None)
 def solve_baseline_problem(
     problem: Dict[str, Any],
     run_id: str,
@@ -153,7 +153,7 @@ def create_results_parquet_task(results: List[Dict[str, Any]], run_id: str) -> s
 
 @flow(name="baseline_gsm8k_flow", log_prints=True)
 def run_baseline_gsm8k(
-    n_problems: int = 200,
+    n_problems: int = 50,
     seed: int = 42,
     model: str = "gpt-4",
     run_id: Optional[str] = None,
@@ -270,18 +270,40 @@ def run_baseline_gsm8k(
 
 
 if __name__ == "__main__":
-    # Run with default parameters for testing
+    import argparse
     import os
 
-    # Check if we have a real API key
-    api_key = os.getenv("OPENAI_API_KEY", "")
-    has_real_key = api_key and not api_key.startswith("sk-demo")
+    from dotenv import load_dotenv
 
-    if has_real_key:
-        print("🔑 Real API key detected - running small test with real calls")
-        result = run_baseline_gsm8k(n_problems=3, model="gpt-4", dry_run=False)
-    else:
-        print("🔄 Demo/no API key - running dry run test")
-        result = run_baseline_gsm8k(n_problems=10, model="gpt-4", dry_run=True)
+    load_dotenv()
 
-    print(f"Test run completed: {result}")
+    parser = argparse.ArgumentParser(description="Run Baseline evaluation on GSM8K")
+    parser.add_argument("--problems", "-n", type=int, default=50, help="Number of problems")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument("--model", type=str, default="deepseek-chat", help="LLM model")
+    parser.add_argument("--dry-run", action="store_true", help="Use mock responses")
+    parser.add_argument("--max-cost", type=float, default=5.0, help="Max cost in USD")
+
+    args = parser.parse_args()
+
+    # Check for the correct API key based on the selected model
+    dry_run_flag = args.dry_run
+    if not dry_run_flag:
+        if "deepseek" in args.model.lower():
+            if not os.getenv("DEEPSEEK_API_KEY"):
+                print("⚠️  DEEPSEEK_API_KEY not found - enabling dry run mode")
+                dry_run_flag = True
+        elif not os.getenv("OPENAI_API_KEY"):
+            print("⚠️  OPENAI_API_KEY not found - enabling dry run mode")
+            dry_run_flag = True
+
+    # Run the flow with the parsed arguments
+    result = run_baseline_gsm8k(
+        n_problems=args.problems,
+        seed=args.seed,
+        model=args.model,
+        dry_run=dry_run_flag,
+        max_cost_usd=args.max_cost,
+    )
+
+    print(f"\n🎉 Baseline evaluation completed: {result}")

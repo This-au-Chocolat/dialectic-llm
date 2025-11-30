@@ -1,17 +1,6 @@
 """
 S2-06: Execute T-A-S+MAMV on 50 GSM8K problems with DeepSeek.
-
-This script executes the MAMV (Majority Voting Multiple Instances) approach
-on 50 GSM8K problems using the same dataset as S2-05.
-
-MAMV Configuration:
-- 3 parallel T-A-S instances per problem
-- Temperatures: [0.65, 0.70, 0.75]
-- Seeds: [101, 202, 303]
-- Majority voting with tie-breaking
-
-Expected cost: ~$0.17 USD (DeepSeek pricing)
-Expected time: ~3 hours
+...
 """
 
 import json
@@ -21,12 +10,17 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+from dotenv import load_dotenv
 
 from flows.tas import TASFlowConfig, run_tas_mamv
 from utils.data_utils import load_gsm8k_batch
 from utils.evaluation import coherence_ts, evaluate_exact_match
+
+# Add src to path (must be before local imports)
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+# Cargar variables de entorno desde .env (after sys.path, before local imports)
+load_dotenv()
 
 # Configuration
 SEED = 42
@@ -103,7 +97,7 @@ def main():
         problem_start = time.time()
         problem_id = problem.get("problem_id", f"problem_{i}")
 
-        print(f"\n[{i+1}/{len(problems)}] Processing: {problem_id}")
+        print(f"\n[{i + 1}/{len(problems)}] Processing: {problem_id}")
 
         try:
             # Execute MAMV flow
@@ -193,12 +187,12 @@ def main():
 
         # Budget check
         if total_cost >= MAX_COST_USD:
-            print(f"\n⚠️  Budget limit reached (${total_cost:.2f}). Stopping at {i+1} problems.")
+            print(f"\n⚠️  Budget limit reached (${total_cost:.2f}). Stopping at {i + 1} problems.")
             break
 
         # Alert at 90%
         if total_cost >= MAX_COST_USD * ALERT_THRESHOLD_PCT and i < len(problems) - 1:
-            print(f"\n⚠️  Alert: {ALERT_THRESHOLD_PCT*100:.0f}% of budget used")
+            print(f"\n⚠️  Alert: {ALERT_THRESHOLD_PCT * 100:.0f}% of budget used")
 
     # Summary
     elapsed_time = time.time() - start_time
@@ -214,10 +208,10 @@ def main():
     print(f"Successfully completed:   {completed}")
     print(f"Errors:                   {len(results) - completed}")
     print(f"Correct:                  {correct}/{completed}")
-    print(f"Accuracy:                 {accuracy:.3f} ({accuracy*100:.1f}%)")
+    print(f"Accuracy:                 {accuracy:.3f} ({accuracy * 100:.1f}%)")
     print(f"Total cost:               ${total_cost:.2f} USD")
-    print(f"Cost per problem:         ${total_cost/len(results):.4f} USD")
-    print(f"Elapsed time:             {elapsed_time/60:.1f} minutes")
+    print(f"Cost per problem:         ${total_cost / len(results):.4f} USD")
+    print(f"Elapsed time:             {elapsed_time / 60:.1f} minutes")
 
     # Decision method breakdown
     decision_methods = {}
@@ -230,11 +224,11 @@ def main():
         pct = count / len(results) * 100
         print(f"  {method:30s}: {count:3d} ({pct:5.1f}%)")
 
-    # Save results to JSON
-    output_dir = Path("analytics/mamv")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    # Save results to JSON (optional, but keep for now)
+    output_dir_json = Path("analytics/mamv")  # Keep JSON in its original folder
+    output_dir_json.mkdir(parents=True, exist_ok=True)
 
-    output_file = output_dir / f"mamv_results_{run_id}.json"
+    output_file = output_dir_json / f"mamv_results_{run_id}.json"
     with open(output_file, "w") as f:
         json.dump(
             {
@@ -259,7 +253,7 @@ def main():
             indent=2,
         )
 
-    print(f"\n💾 Results saved to: {output_file}")
+    print(f"\n💾 JSON results saved to: {output_file}")
 
     # Convert to Parquet for analytics
     print("\n📊 Creating Parquet file...")
@@ -290,7 +284,10 @@ def main():
             flat_results.append(flat_r)
 
         table = pa.Table.from_pylist(flat_results)
-        parquet_file = output_dir / f"mamv_results_{run_id}.parquet"
+        # Change output_dir to analytics/parquet for Parquet files
+        parquet_output_dir = Path("analytics/parquet")
+        parquet_output_dir.mkdir(parents=True, exist_ok=True)
+        parquet_file = parquet_output_dir / f"mamv_results_{run_id}.parquet"
         pq.write_table(table, parquet_file)
         print(f"✅ Parquet saved to: {parquet_file}")
     except Exception as e:

@@ -13,6 +13,8 @@ __pycache__/
 
 # Datos / artefactos
 logs_local/
+logs/events/
+analytics/parquet/
 logs/**/*.tmp
 analytics/**/*.tmp
 
