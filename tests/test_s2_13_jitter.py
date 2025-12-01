@@ -1,5 +1,5 @@
-import pytest
 from src.flows.jitter_runner import jitter
+
 
 def test_run_s2_13_jitter_returns_expected_format():
     results = jitter()

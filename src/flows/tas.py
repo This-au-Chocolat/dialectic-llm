@@ -772,6 +772,7 @@ def create_tas_parquet_task(results: List[Dict[str, Any]], run_id: str) -> str:
 # T-A-S with Jittered Temperatures Flow
 # -------------------------------
 
+
 def run_s2_13_jitter(
     n_problems: int,
     seed: int,
@@ -799,17 +800,13 @@ def run_s2_13_jitter(
     for temp in temperatures:
         for jitter_seed in jitter_seeds:
             for problem in problems:
-
                 thesis_resp = LLMClient(model=model).call(
                     prompt=make_prompt_thesis(problem["question"]),
                     temperature=temp,
                 )
 
                 antithesis_resp = LLMClient(model=model).call(
-                    prompt=make_prompt_antithesis(
-                        problem["question"],
-                        thesis_resp["completion"]
-                    ),
+                    prompt=make_prompt_antithesis(problem["question"], thesis_resp["completion"]),
                     temperature=temp,
                 )
 
@@ -817,19 +814,21 @@ def run_s2_13_jitter(
                     prompt=make_prompt_synthesis(
                         problem["question"],
                         thesis_resp["completion"],
-                        antithesis_resp["completion"]
+                        antithesis_resp["completion"],
                     ),
                     temperature=temp,
                 )
 
-                all_results.append({
-                    "problem_id": problem["problem_id"],
-                    "temperature": temp,
-                    "jitter_seed": jitter_seed,
-                    "thesis": thesis_resp,
-                    "antithesis": antithesis_resp,
-                    "synthesis": synthesis_resp,
-                })
+                all_results.append(
+                    {
+                        "problem_id": problem["problem_id"],
+                        "temperature": temp,
+                        "jitter_seed": jitter_seed,
+                        "thesis": thesis_resp,
+                        "antithesis": antithesis_resp,
+                        "synthesis": synthesis_resp,
+                    }
+                )
 
     # Parquet dummy (el test solo verifica que exista)
     final_parquet = Path(parquet_path) / f"jitter_{run_id}.parquet"
@@ -863,8 +862,6 @@ def run_tas_gsm8k(
     logs_path: Optional[str] = None,
     parquet_path: Optional[str] = None,
 ):
-
-
     """
     Run T-A-S evaluation on GSM8K problems using Prefect orchestration.
 

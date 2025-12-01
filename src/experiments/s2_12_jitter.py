@@ -1,20 +1,17 @@
+from utils.backoff import retry_with_backoff, RetryableError
 import logging
 
-from utils.backoff import RetryableError, retry_with_backoff
-
-logger = logging.getLogger("jitter")
+logger = logging.getLogger("s2_12_jitter")
 logger.setLevel(logging.DEBUG)
 
-
+# Esta sería la función "flaky" que quieres probar
 def simulated_llm_call(param: str) -> dict:
     import random
-
     if random.random() < 0.7:
         raise RetryableError("Simulated transient failure")
     return {"result": f"Successful response for {param}"}
 
-
-def jitter():
+def run_s2_12_jitter():
     params = ["prompt1", "prompt2", "prompt3"]
     results = []
     for param in params:
