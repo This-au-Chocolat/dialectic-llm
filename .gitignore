@@ -25,4 +25,4 @@ analytics/**/*.tmp
 
 # Reports
 # reports/*.pdf
-./src/experiments/
+experiments/
