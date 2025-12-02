@@ -1,0 +1,1674 @@
+{
+  "run_id": "s2_06_mamv_20251127_164429",
+  "config": {
+    "model": "deepseek-chat",
+    "n_problems": 50,
+    "seed": 42,
+    "max_cost_usd": 5.0
+  },
+  "summary": {
+    "total_problems": 50,
+    "completed": 50,
+    "correct": 49,
+    "accuracy": 0.98,
+    "total_cost_usd": 0.27590253600000003,
+    "elapsed_seconds": 12018.866542339325
+  },
+  "results": [
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0000",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Mimi picked up 2 dozen seashells on the beach.  Kyle found twice as many shells as Mimi and put them in his pocket. Leigh grabbed one-third of the shells that Kyle found.  How many seashells did Leigh have?",
+      "true_answer": 16.0,
+      "predicted_answer_raw": "16",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "16": 3
+      },
+      "individual_votes": [
+        "16",
+        "16",
+        "16"
+      ],
+      "coherence_avg": 0.8023995161056519,
+      "coherences": [
+        0.832909345626831,
+        0.7744883298873901,
+        0.7998008728027344
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8705,
+        "completion_tokens": 5955,
+        "total_tokens": 14660
+      },
+      "cost_usd": 0.00533624,
+      "elapsed_seconds": 228.89523482322693
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0001",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Frankie's parents let him have many pets. He has six more snakes than he has cats. He has one less parrot than cats. Six of his pets have four legs. He has 2 dogs. How many pets does he have in total?",
+      "true_answer": 19.0,
+      "predicted_answer_raw": "19",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "19": 3
+      },
+      "individual_votes": [
+        "19",
+        "19",
+        "19"
+      ],
+      "coherence_avg": 0.8299647569656372,
+      "coherences": [
+        0.8610614538192749,
+        0.845723032951355,
+        0.7831097841262817
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8829,
+        "completion_tokens": 6293,
+        "total_tokens": 15122
+      },
+      "cost_usd": 0.005504408,
+      "elapsed_seconds": 215.91167378425598
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0002",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Olaf collects colorful toy cars. At first, his collection consisted of 150 cars. His family, knowing his hobby, decided to give him some toy cars. Grandpa gave Olaf twice as many toy cars as the uncle. Dad gave Olaf 10 toy cars, 5 less than Mum. Auntie gave Olaf 6 toy cars, 1 more than the uncle. How many toy cars does Olaf have in total, after receiving all these gifts?",
+      "true_answer": 196.0,
+      "predicted_answer_raw": "196",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "196": 3
+      },
+      "individual_votes": [
+        "196",
+        "196",
+        "196"
+      ],
+      "coherence_avg": 0.8665811419487,
+      "coherences": [
+        0.8833960294723511,
+        0.8694262504577637,
+        0.8469211459159851
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9660,
+        "completion_tokens": 6294,
+        "total_tokens": 15954
+      },
+      "cost_usd": 0.005807255999999999,
+      "elapsed_seconds": 217.05025601387024
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0003",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Emma's bank account has $100 in it. Each day of the week, she spends $8. At the end of the week, she goes to the bank and asks for as many $5 bills as her account can give her. She leaves the rest in the account. How many dollars remain in the account?",
+      "true_answer": 4.0,
+      "predicted_answer_raw": "4",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "4": 3
+      },
+      "individual_votes": [
+        "4",
+        "4",
+        "4"
+      ],
+      "coherence_avg": 0.8622719248135885,
+      "coherences": [
+        0.8873843550682068,
+        0.8167014718055725,
+        0.8827299475669861
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9674,
+        "completion_tokens": 6487,
+        "total_tokens": 16161
+      },
+      "cost_usd": 0.005882604,
+      "elapsed_seconds": 222.95374536514282
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0004",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Ezekiel hikes as a hobby. This past summer, he did a challenging three-day hike across 50 kilometers of wilderness. The first day, he covered 10 kilometers of steep mountainside. The second day was flatter and he was able to cover half the full hike distance. How many kilometers did he have to hike on the third day to finish the hike?",
+      "true_answer": 15.0,
+      "predicted_answer_raw": "15",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "15": 3
+      },
+      "individual_votes": [
+        "15",
+        "15",
+        "15"
+      ],
+      "coherence_avg": 0.8546221454938253,
+      "coherences": [
+        0.8833888173103333,
+        0.883127748966217,
+        0.7973498702049255
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9041,
+        "completion_tokens": 6185,
+        "total_tokens": 15226
+      },
+      "cost_usd": 0.005542264,
+      "elapsed_seconds": 217.82574343681335
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0005",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "James decides to build a tin house by collecting 500 tins in a week. On the first day, he collects 50 tins. On the second day, he manages to collect 3 times that number. On the third day, he collects 50 tins fewer than the number he collected on the second day. If he collects an equal number of tins on the remaining days of the week, what's the number of tins he collected each day for the rest of the week?",
+      "true_answer": 50.0,
+      "predicted_answer_raw": "50",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "50": 3
+      },
+      "individual_votes": [
+        "50",
+        "50",
+        "50"
+      ],
+      "coherence_avg": 0.8595298926035563,
+      "coherences": [
+        0.8725482225418091,
+        0.8678966164588928,
+        0.838144838809967
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9367,
+        "completion_tokens": 5810,
+        "total_tokens": 15177
+      },
+      "cost_usd": 0.005524428,
+      "elapsed_seconds": 203.0888934135437
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0006",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Don throws 3 darts.  One is a bullseye worth 50 points.  One completely missed the target, so received no points. The third was worth half the points of the bullseye.  What is the final score from these 3 throws?",
+      "true_answer": 75.0,
+      "predicted_answer_raw": "75",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "75": 3
+      },
+      "individual_votes": [
+        "75",
+        "75",
+        "75"
+      ],
+      "coherence_avg": 0.8665781021118164,
+      "coherences": [
+        0.8325446248054504,
+        0.8948249816894531,
+        0.8723646998405457
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 7647,
+        "completion_tokens": 4761,
+        "total_tokens": 12408
+      },
+      "cost_usd": 0.0045165119999999994,
+      "elapsed_seconds": 170.43091106414795
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0007",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "TreQuan is throwing rocks in the river and he notices that the bigger the rock, the wider the splash. Pebbles make a splash that is a 1/4 meter wide. Rocks make a splash that is 1/2 a meter wide, and boulders create a splash that is 2 meters wide. If he tosses 6 pebbles, 3 rocks, and 2 boulders, what is the total width of the splashes he makes?",
+      "true_answer": 7.0,
+      "predicted_answer_raw": "7",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "7": 3
+      },
+      "individual_votes": [
+        "7",
+        "7",
+        "7"
+      ],
+      "coherence_avg": 0.8865733544031779,
+      "coherences": [
+        0.8834024667739868,
+        0.8920885324478149,
+        0.8842290639877319
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9382,
+        "completion_tokens": 6055,
+        "total_tokens": 15437
+      },
+      "cost_usd": 0.005619068,
+      "elapsed_seconds": 214.44338083267212
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0008",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Pauly is making omelets for his family. There are three dozen eggs, and he plans to use them all. Each omelet requires 4 eggs. Including himself, there are 3 people. How many omelets does each person get?",
+      "true_answer": 3.0,
+      "predicted_answer_raw": "3",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "3": 3
+      },
+      "individual_votes": [
+        "3",
+        "3",
+        "3"
+      ],
+      "coherence_avg": 0.8461620012919108,
+      "coherences": [
+        0.8809470534324646,
+        0.8410561084747314,
+        0.8164828419685364
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8166,
+        "completion_tokens": 5333,
+        "total_tokens": 13499
+      },
+      "cost_usd": 0.004913636,
+      "elapsed_seconds": 189.00489950180054
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0009",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Thomas made 4 stacks of wooden blocks. The first stack was 7 blocks tall. The second stack was 3 blocks taller than the first. The third stack was 6 blocks shorter than the second stack, and the fourth stack was 10 blocks taller than the third stack. If the fifth stack has twice as many blocks as the second stack, how many blocks did Thomas use in all?",
+      "true_answer": 55.0,
+      "predicted_answer_raw": "55",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "55": 3
+      },
+      "individual_votes": [
+        "55",
+        "55",
+        "55"
+      ],
+      "coherence_avg": 0.911835233370463,
+      "coherences": [
+        0.9319754242897034,
+        0.8853987455368042,
+        0.9181315302848816
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9314,
+        "completion_tokens": 6139,
+        "total_tokens": 15453
+      },
+      "cost_usd": 0.005624891999999999,
+      "elapsed_seconds": 217.46938562393188
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0010",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Trace has five shopping bags that weigh the same amount as Gordon\u2019s two shopping bags. One of Gordon\u2019s shopping bags weighs three pounds and the other weighs seven. Trace\u2019s shopping bags all weigh the same amount. How many pounds does one of Trace\u2019s bags weigh?",
+      "true_answer": 2.0,
+      "predicted_answer_raw": "2",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "2": 3
+      },
+      "individual_votes": [
+        "2",
+        "2",
+        "2"
+      ],
+      "coherence_avg": 0.8891159296035767,
+      "coherences": [
+        0.8968149423599243,
+        0.8569852113723755,
+        0.9135476350784302
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8450,
+        "completion_tokens": 5559,
+        "total_tokens": 14009
+      },
+      "cost_usd": 0.005099276,
+      "elapsed_seconds": 204.47923588752747
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0011",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "A library has a number of books. 35% of them are intended for children and 104 of them are for adults. How many books are in the library?",
+      "true_answer": 160.0,
+      "predicted_answer_raw": "160",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "160": 3
+      },
+      "individual_votes": [
+        "160",
+        "160",
+        "160"
+      ],
+      "coherence_avg": 0.8521273533503214,
+      "coherences": [
+        0.8450727462768555,
+        0.8460706472396851,
+        0.8652386665344238
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8822,
+        "completion_tokens": 5831,
+        "total_tokens": 14653
+      },
+      "cost_usd": 0.005333691999999999,
+      "elapsed_seconds": 214.15737581253052
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0012",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Nicky is trading baseball cards with Jill. If Nicky trades two cards worth $8 each for 1 card worth $21, how many dollars of profit does he make?",
+      "true_answer": 5.0,
+      "predicted_answer_raw": "5",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "5": 3
+      },
+      "individual_votes": [
+        "5",
+        "5",
+        "5"
+      ],
+      "coherence_avg": 0.8570921222368876,
+      "coherences": [
+        0.8913992047309875,
+        0.8373780250549316,
+        0.8424991369247437
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8212,
+        "completion_tokens": 5522,
+        "total_tokens": 13734
+      },
+      "cost_usd": 0.004999176,
+      "elapsed_seconds": 212.1619062423706
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0013",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Patricia is making a highlight film about her basketball team. She recorded video of every player and plans to put it all together in a longer movie. She has 130 seconds of the point guard, 145 seconds of the shooting guard, 85 seconds of the small forward, 60 seconds of the power forward, and 180 seconds of the center. How on average, how many minutes does each player get?",
+      "true_answer": 2.0,
+      "predicted_answer_raw": "2",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "2": 3
+      },
+      "individual_votes": [
+        "2",
+        "2",
+        "2"
+      ],
+      "coherence_avg": 0.895565946896871,
+      "coherences": [
+        0.9091106057167053,
+        0.9072026610374451,
+        0.8703845739364624
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9823,
+        "completion_tokens": 6511,
+        "total_tokens": 16334
+      },
+      "cost_usd": 0.005945575999999999,
+      "elapsed_seconds": 237.63303685188293
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0014",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Julie, Letitia and Anton decided to have dinner together at a nearby restaurant.  Julie orders $10 worth of food, Letitia orders $20 worth of food, and Anton orders $30 worth of food.  How much should each pay in tips if they want to split a 20% tip for the whole meal evenly?",
+      "true_answer": 4.0,
+      "predicted_answer_raw": "4",
+      "is_correct": true,
+      "decision_method": "majority_2_of_3",
+      "vote_counts": {
+        "2": 1,
+        "4": 2
+      },
+      "individual_votes": [
+        "2",
+        "4",
+        "4"
+      ],
+      "coherence_avg": 0.8655919830004374,
+      "coherences": [
+        0.9265868663787842,
+        0.8281835913658142,
+        0.8420054912567139
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9711,
+        "completion_tokens": 6477,
+        "total_tokens": 16188
+      },
+      "cost_usd": 0.0058924319999999995,
+      "elapsed_seconds": 222.08487129211426
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0015",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Niko has bought 9 pairs of socks that cost $2 each and plans to resell them. He wants to gain 25% profit from four of the pairs of socks and $0.2 profit each for the other 5 pairs of socks. How much will his total profit be?",
+      "true_answer": 3.0,
+      "predicted_answer_raw": "3.00",
+      "is_correct": true,
+      "decision_method": "majority_2_of_3",
+      "vote_counts": {
+        "3.00": 2,
+        "3": 1
+      },
+      "individual_votes": [
+        "3.00",
+        "3",
+        "3.00"
+      ],
+      "coherence_avg": 0.8941844701766968,
+      "coherences": [
+        0.8875236511230469,
+        0.9001893997192383,
+        0.8948403596878052
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9588,
+        "completion_tokens": 6802,
+        "total_tokens": 16390
+      },
+      "cost_usd": 0.005965959999999999,
+      "elapsed_seconds": 229.39794397354126
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0016",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "The number of short students in a class is 2/5 of the total number of students. If there are 90 tall students, and the class has 400 students, calculate the total number of students with average height.",
+      "true_answer": 150.0,
+      "predicted_answer_raw": "150",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "150": 3
+      },
+      "individual_votes": [
+        "150",
+        "150",
+        "150"
+      ],
+      "coherence_avg": 0.8823710083961487,
+      "coherences": [
+        0.8947218060493469,
+        0.872941792011261,
+        0.8794494271278381
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8688,
+        "completion_tokens": 5769,
+        "total_tokens": 14457
+      },
+      "cost_usd": 0.005262347999999999,
+      "elapsed_seconds": 199.65627193450928
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0017",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "James buys 20 coins of a cryptocurrency at $15 each.  The value of the coins increases by 2/3.  He sells coins to recoup his original investment.  How many coins did he sell?",
+      "true_answer": 12.0,
+      "predicted_answer_raw": "12",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "12": 3
+      },
+      "individual_votes": [
+        "12",
+        "12",
+        "12"
+      ],
+      "coherence_avg": 0.8880327939987183,
+      "coherences": [
+        0.9165781736373901,
+        0.8788613080978394,
+        0.8686589002609253
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9480,
+        "completion_tokens": 6586,
+        "total_tokens": 16066
+      },
+      "cost_usd": 0.005848024000000001,
+      "elapsed_seconds": 227.3673644065857
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0018",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "In the park, the first rose bush has 12 red flowers.  The second rose bush has 18 pink flowers.  The third rose bush has 20 yellow flowers.  The fourth rose bush has 8 orange flowers.  For her vase, Lorelei picks 50% of the red roses, 50% pink roses, 25% of the yellow roses, and 25% orange roses. How many roses are in her vase?",
+      "true_answer": 22.0,
+      "predicted_answer_raw": "22",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "22": 3
+      },
+      "individual_votes": [
+        "22",
+        "22",
+        "22"
+      ],
+      "coherence_avg": 0.8409163355827332,
+      "coherences": [
+        0.8824325203895569,
+        0.799717903137207,
+        0.8405985832214355
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 10382,
+        "completion_tokens": 6878,
+        "total_tokens": 17260
+      },
+      "cost_usd": 0.00628264,
+      "elapsed_seconds": 234.72474122047424
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0019",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Tonya has opened a lemonade stand selling lemonade in small, medium, and large cups at $1, $2 and $3 respectively. At the close of business she ended up making $50.  As she went back through her inventory she noticed that she sold $11 worth of small lemonades and $24 worth of medium lemonades. How many cups of large lemonade did Tonya sell?",
+      "true_answer": 5.0,
+      "predicted_answer_raw": "5",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "5": 3
+      },
+      "individual_votes": [
+        "5",
+        "5",
+        "5"
+      ],
+      "coherence_avg": 0.8114149967829386,
+      "coherences": [
+        0.7844091653823853,
+        0.8034778237342834,
+        0.8463580012321472
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8678,
+        "completion_tokens": 5520,
+        "total_tokens": 14198
+      },
+      "cost_usd": 0.005168072,
+      "elapsed_seconds": 196.28165459632874
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0020",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Leo's assignment was divided into three parts. He finished the first part of his assignment in 25 minutes. It took him twice as long to finish the second part. If he was able to finish his assignment in 2 hours, how many minutes did Leo finish the third part of the assignment?",
+      "true_answer": 45.0,
+      "predicted_answer_raw": "45",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "45": 3
+      },
+      "individual_votes": [
+        "45",
+        "45",
+        "45"
+      ],
+      "coherence_avg": 0.8574351270993551,
+      "coherences": [
+        0.8521029949188232,
+        0.912960946559906,
+        0.8072414398193359
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8439,
+        "completion_tokens": 5574,
+        "total_tokens": 14013
+      },
+      "cost_usd": 0.005100731999999999,
+      "elapsed_seconds": 200.45829701423645
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0021",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Connor is taking his date to the movies.  The tickets cost $10.00 each.  They decided to get the large popcorn & 2 drink combo meal for $11.00 and each grab a box of candy for $2.50 each.  How much will Connor spend on his date?",
+      "true_answer": 36.0,
+      "predicted_answer_raw": "36.00",
+      "is_correct": true,
+      "decision_method": "majority_2_of_3",
+      "vote_counts": {
+        "36.00": 2,
+        "18.00": 1
+      },
+      "individual_votes": [
+        "36.00",
+        "18.00",
+        "36.00"
+      ],
+      "coherence_avg": 0.8392689824104309,
+      "coherences": [
+        0.8283860087394714,
+        0.9160093665122986,
+        0.7734115719795227
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9108,
+        "completion_tokens": 6189,
+        "total_tokens": 15297
+      },
+      "cost_usd": 0.0055681079999999996,
+      "elapsed_seconds": 234.95395159721375
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0022",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Susie has 572 beans in the jar. One-fourth of them are red and one-third of the remaining beans are white. Then half of the remaining are green beans. How many green beans are there?",
+      "true_answer": 143.0,
+      "predicted_answer_raw": "143",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "143": 3
+      },
+      "individual_votes": [
+        "143",
+        "143",
+        "143"
+      ],
+      "coherence_avg": 0.8835227489471436,
+      "coherences": [
+        0.8768651485443115,
+        0.8972175717353821,
+        0.8764855265617371
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9530,
+        "completion_tokens": 6949,
+        "total_tokens": 16479
+      },
+      "cost_usd": 0.005998356,
+      "elapsed_seconds": 262.8920350074768
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0023",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Jim collects model cars, and he has 301 models total.  Jim has 4 times as many Buicks as Fords, and 3 more than twice the number of Fords than Chevys.  How many Buicks does Jim have?",
+      "true_answer": 220.0,
+      "predicted_answer_raw": "220",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "220": 3
+      },
+      "individual_votes": [
+        "220",
+        "220",
+        "220"
+      ],
+      "coherence_avg": 0.7980096936225891,
+      "coherences": [
+        0.8170721530914307,
+        0.837458074092865,
+        0.7394988536834717
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9766,
+        "completion_tokens": 6815,
+        "total_tokens": 16581
+      },
+      "cost_usd": 0.006035484000000001,
+      "elapsed_seconds": 263.07384419441223
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0024",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Peter has a plan to take his family on a vacation to Germany. He needs $5,000 to cover all the spending for the travel, and he has $2,900 in savings right now. If he can save up $700 each month, how many months does he need to wait to reach his goal?",
+      "true_answer": 3.0,
+      "predicted_answer_raw": "3",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "3": 3
+      },
+      "individual_votes": [
+        "3",
+        "3",
+        "3"
+      ],
+      "coherence_avg": 0.8193523486455282,
+      "coherences": [
+        0.8615125417709351,
+        0.8619102835655212,
+        0.7346342206001282
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9452,
+        "completion_tokens": 6243,
+        "total_tokens": 15695
+      },
+      "cost_usd": 0.00571298,
+      "elapsed_seconds": 263.1260735988617
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0025",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Wendy spent 25 years as an accountant and 15 years as an accounting manager. If Wendy lived to be 80 years old, what percentage of her life did she spend in an accounting-related job?",
+      "true_answer": 50.0,
+      "predicted_answer_raw": "50",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "50": 3
+      },
+      "individual_votes": [
+        "50",
+        "50",
+        "50"
+      ],
+      "coherence_avg": 0.879732588926951,
+      "coherences": [
+        0.882297933101654,
+        0.884441614151001,
+        0.8724582195281982
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8639,
+        "completion_tokens": 5873,
+        "total_tokens": 14512
+      },
+      "cost_usd": 0.005282368,
+      "elapsed_seconds": 232.35764241218567
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0026",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Last year, Peter organized a Fun Run for his community project and 200 people signed up. Forty people did not show up to run. This year, there will be twice as many runners as last year. How many people will run this year?",
+      "true_answer": 320.0,
+      "predicted_answer_raw": "320",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "320": 3
+      },
+      "individual_votes": [
+        "320",
+        "320",
+        "320"
+      ],
+      "coherence_avg": 0.8860099911689758,
+      "coherences": [
+        0.8712837100028992,
+        0.9134198427200317,
+        0.8733264207839966
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8524,
+        "completion_tokens": 6035,
+        "total_tokens": 14559
+      },
+      "cost_usd": 0.005299475999999999,
+      "elapsed_seconds": 241.54785418510437
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0027",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Dulce's father has eight orange trees on his farm. If each tree has 200 fruits and Dulce picks 2/5 of the oranges from each tree, calculate the total number of fruits remaining in all the trees.",
+      "true_answer": 960.0,
+      "predicted_answer_raw": "960",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "960": 3
+      },
+      "individual_votes": [
+        "960",
+        "960",
+        "960"
+      ],
+      "coherence_avg": 0.902214785416921,
+      "coherences": [
+        0.8888723850250244,
+        0.919682502746582,
+        0.8980894684791565
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8412,
+        "completion_tokens": 5445,
+        "total_tokens": 13857
+      },
+      "cost_usd": 0.0050439479999999995,
+      "elapsed_seconds": 215.200368642807
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0028",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Padma is trading cards with Robert. Padma started with 75 cards and traded 2 or her valuable ones for 10 of Robert's cards. Robert started with 88 of his own cards and traded another 8 of his cards for 15 of Padma's cards. How many cards were traded between both Padma and Robert?",
+      "true_answer": 35.0,
+      "predicted_answer_raw": "35",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "35": 3
+      },
+      "individual_votes": [
+        "35",
+        "35",
+        "35"
+      ],
+      "coherence_avg": 0.8827109932899475,
+      "coherences": [
+        0.8920741677284241,
+        0.8536548018455505,
+        0.9024040102958679
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 10572,
+        "completion_tokens": 6851,
+        "total_tokens": 17423
+      },
+      "cost_usd": 0.0063419719999999995,
+      "elapsed_seconds": 263.95424365997314
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0029",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Jason is planning a parking garage that will have 12 floors. Every 3rd floor has a gate where drivers have to show ID, which takes two minutes. To get from one floor to the next, drivers have to drive 800 feet at 10 feet/second. How long, in seconds, does it take to get to the bottom of the garage from the top?",
+      "true_answer": 1440.0,
+      "predicted_answer_raw": "1360",
+      "is_correct": false,
+      "decision_method": "majority_2_of_3",
+      "vote_counts": {
+        "1360": 2,
+        "1240": 1
+      },
+      "individual_votes": [
+        "1360",
+        "1360",
+        "1240"
+      ],
+      "coherence_avg": 0.8005354404449463,
+      "coherences": [
+        0.8098211288452148,
+        0.8245553970336914,
+        0.7672297954559326
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 13292,
+        "completion_tokens": 8732,
+        "total_tokens": 22024
+      },
+      "cost_usd": 0.008016736,
+      "elapsed_seconds": 338.6143798828125
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0030",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "There are 920 deer in a park. 10% of the deer have 8 antlers, and a quarter of that number also have albino fur. How many albino 8-antlered deer are there?",
+      "true_answer": 23.0,
+      "predicted_answer_raw": "23",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "23": 3
+      },
+      "individual_votes": [
+        "23",
+        "23",
+        "23"
+      ],
+      "coherence_avg": 0.8079906900723776,
+      "coherences": [
+        0.8723627924919128,
+        0.7982631325721741,
+        0.7533461451530457
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8059,
+        "completion_tokens": 5746,
+        "total_tokens": 13805
+      },
+      "cost_usd": 0.00502502,
+      "elapsed_seconds": 267.0593557357788
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0031",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Allison went to the craft store with her friend Marie to buy some glue sticks and construction paper. Allison bought 8 more glue sticks than Marie, but Marie bought six times as many packs of construction paper as Allison. If Marie bought 15 glue sticks and 30 packs of construction paper how many craft supply items did Allison buy all together?",
+      "true_answer": 28.0,
+      "predicted_answer_raw": "28",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "28": 3
+      },
+      "individual_votes": [
+        "28",
+        "28",
+        "28"
+      ],
+      "coherence_avg": 0.8733318249384562,
+      "coherences": [
+        0.860590398311615,
+        0.8486777544021606,
+        0.910727322101593
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9165,
+        "completion_tokens": 5888,
+        "total_tokens": 15053
+      },
+      "cost_usd": 0.005479292,
+      "elapsed_seconds": 278.8893675804138
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0032",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "James gets bored with his game so decides to play a different one.  That game promises 100 hours of gameplay but 80% of that is boring grinding.  However, the expansion does add another 30 hours of enjoyable gameplay.  How much enjoyable gameplay does James get?",
+      "true_answer": 50.0,
+      "predicted_answer_raw": "50",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "50": 3
+      },
+      "individual_votes": [
+        "50",
+        "50",
+        "50"
+      ],
+      "coherence_avg": 0.8987768689791361,
+      "coherences": [
+        0.9027428030967712,
+        0.9440109729766846,
+        0.8495768308639526
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8675,
+        "completion_tokens": 5931,
+        "total_tokens": 14606
+      },
+      "cost_usd": 0.005316584,
+      "elapsed_seconds": 267.60180711746216
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0033",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Monica and Michelle are combining their money to throw a party. Monica brings $15. Michelle brings $12. The cake costs 15 dollars, and soda is $3 a bottle. Each bottle of soda has 12 servings and they buy as many bottles of soda as they can afford. If there are 8 total guests, how many servings of soda does each get?",
+      "true_answer": 6.0,
+      "predicted_answer_raw": "6",
+      "is_correct": true,
+      "decision_method": "majority_2_of_3",
+      "vote_counts": {
+        "6": 2,
+        "4": 1
+      },
+      "individual_votes": [
+        "6",
+        "4",
+        "6"
+      ],
+      "coherence_avg": 0.9084059596061707,
+      "coherences": [
+        0.9066213369369507,
+        0.9152075052261353,
+        0.903389036655426
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 10823,
+        "completion_tokens": 6651,
+        "total_tokens": 17474
+      },
+      "cost_usd": 0.006360536,
+      "elapsed_seconds": 298.88136172294617
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0034",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Peter is buying a set of glasses. They cost $3 for small glasses and $5 for large ones. He has $50.  If he buys 8 small ones and leaves with $1 in change, how many large ones did he buy?",
+      "true_answer": 5.0,
+      "predicted_answer_raw": "5",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "5": 3
+      },
+      "individual_votes": [
+        "5",
+        "5",
+        "5"
+      ],
+      "coherence_avg": 0.8552554051081339,
+      "coherences": [
+        0.8410931825637817,
+        0.8496360182762146,
+        0.8750370144844055
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8378,
+        "completion_tokens": 5256,
+        "total_tokens": 13634
+      },
+      "cost_usd": 0.004962776,
+      "elapsed_seconds": 234.55313730239868
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0035",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Mara has 40 crayons and 10 percent of her crayons are pink. Luna has 50 crayons and 20 percent of them are pink. In total how many pink crayons do Mara and Luna have?",
+      "true_answer": 14.0,
+      "predicted_answer_raw": "14",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "14": 3
+      },
+      "individual_votes": [
+        "14",
+        "14",
+        "14"
+      ],
+      "coherence_avg": 0.8128923177719116,
+      "coherences": [
+        0.836557924747467,
+        0.7873767614364624,
+        0.8147422671318054
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8616,
+        "completion_tokens": 5803,
+        "total_tokens": 14419
+      },
+      "cost_usd": 0.005248516,
+      "elapsed_seconds": 260.2877378463745
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0036",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Jane is trying to decide whether to buy a house or a trailer. A house costs $480,000 and a trailer costs $120,000. Each loan will be paid in monthly installments over 20 years. How much more is the monthly payment on the house compared to the trailer?",
+      "true_answer": 1500.0,
+      "predicted_answer_raw": "1500",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "1500": 3
+      },
+      "individual_votes": [
+        "1500",
+        "1500",
+        "1500"
+      ],
+      "coherence_avg": 0.8590456247329712,
+      "coherences": [
+        0.8758633732795715,
+        0.859955370426178,
+        0.8413181304931641
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 11473,
+        "completion_tokens": 7977,
+        "total_tokens": 19450
+      },
+      "cost_usd": 0.007079800000000001,
+      "elapsed_seconds": 345.90678882598877
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0037",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Mia is buying Christmas gifts for her family. She has spent $30 on each of her 3 siblings, and the rest of her spending was for her parents. If Mia spent a total of $150 on Christmas gifts and each of her parents received gifts of equal value, how much money, in dollars, did she spend on each parent\u2019s gift?",
+      "true_answer": 30.0,
+      "predicted_answer_raw": "30",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "30": 3
+      },
+      "individual_votes": [
+        "30",
+        "30",
+        "30"
+      ],
+      "coherence_avg": 0.8689552744229635,
+      "coherences": [
+        0.9170942902565002,
+        0.8499997854232788,
+        0.8397717475891113
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 7744,
+        "completion_tokens": 4667,
+        "total_tokens": 12411
+      },
+      "cost_usd": 0.004517604,
+      "elapsed_seconds": 213.3483066558838
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0038",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Clare's mother gave her $47 to go to the store. Clare bought 4 loaves of bread and 2 cartons of milk. Each loaf of bread cost $2 and each carton of milk cost $2. How much money does Clare have left?",
+      "true_answer": 35.0,
+      "predicted_answer_raw": "35",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "35": 3
+      },
+      "individual_votes": [
+        "35",
+        "35",
+        "35"
+      ],
+      "coherence_avg": 0.8061972657839457,
+      "coherences": [
+        0.7771324515342712,
+        0.844804048538208,
+        0.7966552972793579
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8159,
+        "completion_tokens": 4906,
+        "total_tokens": 13065
+      },
+      "cost_usd": 0.00475566,
+      "elapsed_seconds": 235.67464232444763
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0039",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Oshea bought 200 basil seeds. He wants to plant them in planters. He has 4 large planters that can hold 20 seeds each. He also has small planters that can hold 4 seeds each. How many small planters will he need to plant all the basil seeds?",
+      "true_answer": 30.0,
+      "predicted_answer_raw": "30",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "30": 3
+      },
+      "individual_votes": [
+        "30",
+        "30",
+        "30"
+      ],
+      "coherence_avg": 0.8164562980333964,
+      "coherences": [
+        0.790109395980835,
+        0.8346136212348938,
+        0.8246458768844604
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8297,
+        "completion_tokens": 5399,
+        "total_tokens": 13696
+      },
+      "cost_usd": 0.004985344,
+      "elapsed_seconds": 239.87921476364136
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0040",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Eric sorted 150 colored pencils into 5 containers for his art class. Before class, another teacher brought him 30 more pencils. How many can he evenly distribute between the five containers now?",
+      "true_answer": 36.0,
+      "predicted_answer_raw": "36",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "36": 3
+      },
+      "individual_votes": [
+        "36",
+        "36",
+        "36"
+      ],
+      "coherence_avg": 0.8781572381655375,
+      "coherences": [
+        0.8520458936691284,
+        0.8948098421096802,
+        0.887615978717804
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9403,
+        "completion_tokens": 6001,
+        "total_tokens": 15404
+      },
+      "cost_usd": 0.005607056,
+      "elapsed_seconds": 281.4198143482208
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0041",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Oleg is an event organizer. He is organizing an event with 80 guests where 40 of them are men, half the number of men are women, and the rest are children. If he added 10 children to the guest list, how many children will there be at the event?",
+      "true_answer": 30.0,
+      "predicted_answer_raw": "30",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "30": 3
+      },
+      "individual_votes": [
+        "30",
+        "30",
+        "30"
+      ],
+      "coherence_avg": 0.8459620674451193,
+      "coherences": [
+        0.8909315466880798,
+        0.7917771339416504,
+        0.8551775217056274
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9198,
+        "completion_tokens": 6067,
+        "total_tokens": 15265
+      },
+      "cost_usd": 0.00555646,
+      "elapsed_seconds": 238.40092062950134
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0042",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Stella collects stamps. She counted 50 pages in her collector's album. There are 5 rows of 30 stamps in each of the first 10 pages of her album. The rest of the pages each have 50 stamps. How many stamps are in Stella's album?",
+      "true_answer": 3500.0,
+      "predicted_answer_raw": "3500",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "3500": 3
+      },
+      "individual_votes": [
+        "3500",
+        "3500",
+        "3500"
+      ],
+      "coherence_avg": 0.8127241134643555,
+      "coherences": [
+        0.8284556269645691,
+        0.7407407760620117,
+        0.8689759373664856
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8800,
+        "completion_tokens": 6262,
+        "total_tokens": 15062
+      },
+      "cost_usd": 0.005482567999999999,
+      "elapsed_seconds": 241.62304377555847
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0043",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "James gets a cable program.  The first 100 channels cost $100 and the next 100 channels cost half that much.  He splits it evenly with his roommate.  How much did he pay?",
+      "true_answer": 75.0,
+      "predicted_answer_raw": "75",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "75": 3
+      },
+      "individual_votes": [
+        "75",
+        "75",
+        "75"
+      ],
+      "coherence_avg": 0.8498433232307434,
+      "coherences": [
+        0.8745011687278748,
+        0.8486430048942566,
+        0.8263857960700989
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8540,
+        "completion_tokens": 5870,
+        "total_tokens": 14410
+      },
+      "cost_usd": 0.00524524,
+      "elapsed_seconds": 238.9539246559143
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0044",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "A desert garden\u2019s sprinkler system runs twice a day during the cool morning and evening hours. It waters the garden with four liters of water in the morning and six liters in the evening. How many days does it take the sprinkler system to use 50 liters of water?",
+      "true_answer": 5.0,
+      "predicted_answer_raw": "5",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "5": 3
+      },
+      "individual_votes": [
+        "5",
+        "5",
+        "5"
+      ],
+      "coherence_avg": 0.9046768347422282,
+      "coherences": [
+        0.8992562294006348,
+        0.8729845285415649,
+        0.9417897462844849
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 8836,
+        "completion_tokens": 5669,
+        "total_tokens": 14505
+      },
+      "cost_usd": 0.005279819999999999,
+      "elapsed_seconds": 271.38400173187256
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0045",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Mr. Langsley commutes to work every day by bus. The bus picks him up at 6:00 a.m. and takes forty minutes to arrive at the first station. If Mr. Langsley arrives at work at 9:00 a.m., what's the total time taken in minutes from the first station to Mr. Langsley's workplace?",
+      "true_answer": 140.0,
+      "predicted_answer_raw": "140",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "140": 3
+      },
+      "individual_votes": [
+        "140",
+        "140",
+        "140"
+      ],
+      "coherence_avg": 0.8848814566930135,
+      "coherences": [
+        0.8848185539245605,
+        0.8908066749572754,
+        0.8790191411972046
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9832,
+        "completion_tokens": 6381,
+        "total_tokens": 16213
+      },
+      "cost_usd": 0.005901532,
+      "elapsed_seconds": 297.6611521244049
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0046",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Janessa has a plan to give her brother Dexter his first collection of baseball cards. She currently has 4 cards in addition to the 13 that her father gave her.  She ordered a collection of 36 cards from eBay. After inspecting the cards she found 4 cards are in bad shape and decides to throw them away. Janessa ended up giving Dexter 29 cards. How many cards did Janessa keep for herself?",
+      "true_answer": 20.0,
+      "predicted_answer_raw": "20",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "20": 3
+      },
+      "individual_votes": [
+        "20",
+        "20",
+        "20"
+      ],
+      "coherence_avg": 0.863787035147349,
+      "coherences": [
+        0.8052524924278259,
+        0.8949142098426819,
+        0.8911944031715393
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 9021,
+        "completion_tokens": 5811,
+        "total_tokens": 14832
+      },
+      "cost_usd": 0.0053988479999999995,
+      "elapsed_seconds": 264.4025628566742
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0047",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "John buys 3 barbells and gives $850 and gets $40 in change.  How much did each barbell cost?",
+      "true_answer": 270.0,
+      "predicted_answer_raw": "270",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "270": 3
+      },
+      "individual_votes": [
+        "270",
+        "270",
+        "270"
+      ],
+      "coherence_avg": 0.8655322194099426,
+      "coherences": [
+        0.8613294959068298,
+        0.8980445265769958,
+        0.8372226357460022
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 7302,
+        "completion_tokens": 4704,
+        "total_tokens": 12006
+      },
+      "cost_usd": 0.004370184,
+      "elapsed_seconds": 219.27328634262085
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0048",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Mike has earned a total of $160 in wages this week. He received the wages for his first job, then later received the wages from his second job where he works 12 hours a week. If his second job pays $9 per hour then how much money, in dollars, did Mike receive from his first job?",
+      "true_answer": 52.0,
+      "predicted_answer_raw": "52",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "52": 3
+      },
+      "individual_votes": [
+        "52",
+        "52",
+        "52"
+      ],
+      "coherence_avg": 0.8294006784756979,
+      "coherences": [
+        0.8094137907028198,
+        0.8966872096061707,
+        0.782101035118103
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 7917,
+        "completion_tokens": 4849,
+        "total_tokens": 12766
+      },
+      "cost_usd": 0.004646824000000001,
+      "elapsed_seconds": 224.58522057533264
+    },
+    {
+      "run_id": "s2_06_mamv_20251127_164429",
+      "problem_id": "gsm8k_0049",
+      "dataset": "gsm8k",
+      "phase": "tas_mamv",
+      "model": "deepseek-chat",
+      "question": "Wilson decides to go sledding on some nearby hills. On the 2 tall hills, he sleds down them 4 times each and on the 3 small hills, he sled down them half as often as he sleds down the tall hills. How many times did he sled down the hills?",
+      "true_answer": 14.0,
+      "predicted_answer_raw": "14",
+      "is_correct": true,
+      "decision_method": "majority_3_of_3",
+      "vote_counts": {
+        "14": 3
+      },
+      "individual_votes": [
+        "14",
+        "14",
+        "14"
+      ],
+      "coherence_avg": 0.8158789475758871,
+      "coherences": [
+        0.8374097943305969,
+        0.8333960771560669,
+        0.7768309712409973
+      ],
+      "mamv_usage": {
+        "prompt_tokens": 10337,
+        "completion_tokens": 6735,
+        "total_tokens": 17072
+      },
+      "cost_usd": 0.006214207999999999,
+      "elapsed_seconds": 307.87309861183167
+    }
+  ]
+}

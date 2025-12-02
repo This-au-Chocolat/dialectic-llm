@@ -1,5 +1,5 @@
-# src/dialectic_llm/data.py
 import re
+from typing import Any, Dict, List
 
 from datasets import load_dataset
 
@@ -51,3 +51,49 @@ def normalize_answer(answer: str) -> str:
             cleaned = cleaned.replace(".", "")
 
         return cleaned
+
+
+def load_truthfulqa_batch(n: int, seed: int, split: str = "validation"):
+    """
+    Loads a batch of n items from the TruthfulQA dataset with a given seed.
+    """
+    dataset = load_dataset("truthful_qa", "generation", split=split)
+    return dataset.shuffle(seed=seed).select(range(n))
+
+
+def normalize_truthfulqa_answer(answer: str) -> str:
+    """
+    Normalizes a TruthfulQA answer by lowercasing, stripping whitespace,
+    and handling common variations of 'yes' and 'no'.
+    """
+    cleaned_answer = answer.strip().lower()
+    if cleaned_answer in ["yes", "y", "correct", "right"]:
+        return "yes"
+    if cleaned_answer in ["no", "n", "incorrect", "wrong"]:
+        return "no"
+    # Remove trailing punctuation
+    return re.sub(r"[.!,?]$", "", cleaned_answer)
+
+
+def load_truthfulqa_problems(n: int, seed: int = 42) -> List[Dict[str, Any]]:
+    """
+    Load a batch of TruthfulQA problems with standardized processing.
+    """
+    dataset = load_truthfulqa_batch(n=n, seed=seed)
+    problems = []
+    for i, item in enumerate(dataset):
+        correct_answers: List[str] = item.get("correct_answers", [])
+        normalized_correct = [normalize_truthfulqa_answer(ans) for ans in correct_answers]
+
+        problems.append(
+            {
+                "problem_id": f"truthfulqa_{i:04d}",
+                "question": item["question"],
+                "best_answer": normalize_truthfulqa_answer(item["best_answer"]),
+                "correct_answers": normalized_correct,
+                "incorrect_answers": [
+                    normalize_truthfulqa_answer(ans) for ans in item["incorrect_answers"]
+                ],
+            }
+        )
+    return problems
