@@ -1,0 +1,7 @@
+dataset,method,mamv_status,accuracy_pct,total_tokens,cost_usd
+gsm8k,Baseline,MAMV OFF,98.0,15876,0.0036629600000000003
+gsm8k,T-A-S,MAMV OFF,96.0,255405,0.049941360000000004
+gsm8k,T-A-S,MAMV ON,98.0,757974,
+truthful_qa,Baseline,MAMV OFF,98.0,15876,
+truthful_qa,T-A-S,MAMV OFF,0.0,296641,
+truthful_qa,T-A-S,MAMV ON,98.0,757974,
