@@ -56,9 +56,7 @@ def load_data(file_path, model_name):
         df[f"total_tokens_{model_name}"] = 0
         print(f"Warning: No specific token usage column found in {file_path}. Defaulting to 0.")
 
-    return df[
-        ["problem_id", f"is_correct_{model_name}", f"total_tokens_{model_name}"]
-    ]
+    return df[["problem_id", f"is_correct_{model_name}", f"total_tokens_{model_name}"]]
 
 
 def calculate_mcnemar(df, col1, col2):
@@ -70,10 +68,12 @@ def calculate_mcnemar(df, col1, col2):
     # in either rows or columns, or both.
     index_values = [False, True]
     column_values = [False, True]
-    
+
     # Reindex the contingency table to ensure all combinations of True/False exist
-    contingency_table = contingency_table.reindex(index=index_values, columns=column_values).fillna(0)
-    
+    contingency_table = contingency_table.reindex(index=index_values, columns=column_values).fillna(
+        0
+    )
+
     # Ensure the table is sorted consistently
     contingency_table = contingency_table.sort_index(axis=0).sort_index(axis=1)
 
@@ -123,10 +123,16 @@ def main():
     # --- McNemar's Test ---
     print("\nPerforming McNemar's tests...")
     # Only perform if there's a difference to detect
-    pvalue_tas_vs_baseline = calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_tas") \
-        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_tas"]) else None
-    pvalue_mamv_vs_baseline = calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_mamv") \
-        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_mamv"]) else None
+    pvalue_tas_vs_baseline = (
+        calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_tas")
+        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_tas"])
+        else None
+    )
+    pvalue_mamv_vs_baseline = (
+        calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_mamv")
+        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_mamv"])
+        else None
+    )
 
     # --- Prepare results for Parquet and Markdown ---
     kpis = {
@@ -150,7 +156,8 @@ def main():
     md_df = metrics_df.copy()
     md_df["accuracy_pct"] = md_df["accuracy_pct"].map("{:.2f}%".format)
     md_df["delta_accuracy_vs_baseline_pct"] = md_df["delta_accuracy_vs_baseline_pct"].map(
-        "{:+.2f}%".format    )
+        "{:+.2f}%".format
+    )
     md_df["pvalue_vs_baseline"] = md_df["pvalue_vs_baseline"].map(
         lambda p: f"{p:.4f}" if pd.notna(p) else "N/A"
     )

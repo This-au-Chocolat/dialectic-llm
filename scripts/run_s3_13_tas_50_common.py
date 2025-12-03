@@ -1,4 +1,4 @@
-'S3-13: Ejecutar T-A-S (k=1) en 50 problemas comunes con DeepSeek.'
+"S3-13: Ejecutar T-A-S (k=1) en 50 problemas comunes con DeepSeek."
 
 import json
 import os
@@ -8,15 +8,6 @@ from pathlib import Path
 from typing import Dict, List
 
 from dotenv import load_dotenv
-
-# Cargar variables de entorno desde .env
-load_dotenv()
-
-# Verificar que la API key está configurada (DeepSeek o OpenAI)
-if not os.getenv("DEEPSEEK_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-    print("❌ Error: DEEPSEEK_API_KEY or OPENAI_API_KEY not found in environment variables")
-    print("   Please set it in your .env file")
-    sys.exit(1)
 
 # Add src to path
 # This is a temporary solution for the directory structure.
@@ -32,6 +23,15 @@ from src.utils.budget_monitor import (
 )
 from src.utils.evaluation import coherence_ts, evaluate_exact_match
 from src.utils.parquet_utils import create_tas_parquet
+
+# Cargar variables de entorno desde .env
+load_dotenv()
+
+# Verificar que la API key está configurada (DeepSeek o OpenAI)
+if not os.getenv("DEEPSEEK_API_KEY") and not os.getenv("OPENAI_API_KEY"):
+    print("❌ Error: DEEPSEEK_API_KEY or OPENAI_API_KEY not found in environment variables")
+    print("   Please set it in your .env file")
+    sys.exit(1)
 
 # Configuración
 IDS_FILE = "data/processed/common_problem_ids.txt"  # <-- MODIFIED: Use the common IDs file
@@ -50,12 +50,13 @@ def load_problems_from_common_ids() -> List[Dict]:
     # 1. Cargar la lista de problem_id
     with open(IDS_FILE, "r") as f:
         content = f.read()
-        target_ids = {id_str for id_str in content.split('\\n') if id_str.strip()}
-    
+        target_ids = {id_str for id_str in content.split("\\n") if id_str.strip()}
+
     print(f"   - Found {len(target_ids)} target problem IDs.")
 
     # 2. Cargar todo el dataset GSM8K
     from datasets import load_dataset
+
     dataset = load_dataset("gsm8k", "main", split="train")
 
     # 3. Recuperar problemas que coinciden con los IDs
@@ -65,16 +66,21 @@ def load_problems_from_common_ids() -> List[Dict]:
         # Tenemos que asegurarnos de que el ID que generamos aquí coincida.
         # Basado en la inspección de los archivos, el formato es `gsm8k_` + 4 digitos con padding.
         current_id = f"gsm8k_{idx:04d}"
-        
+
         if current_id in target_ids:
-            problems.append({
-                "question": item["question"],
-                "answer": item["answer"],
-                "problem_id": current_id,
-            })
+            problems.append(
+                {
+                    "question": item["question"],
+                    "answer": item["answer"],
+                    "problem_id": current_id,
+                }
+            )
 
     if len(problems) != len(target_ids):
-        print(f"⚠️  Warning: Could not find all problems. Found {len(problems)} out of {len(target_ids)}.")
+        print(
+            f"⚠️  Warning: Could not find all problems. Found {len(problems)} out of "
+            f"{len(target_ids)}."
+        )
 
     print(f"✅ Loaded {len(problems)} complete problems.")
     return problems
@@ -180,25 +186,38 @@ def main():
 
             status_icon = "✅" if result["is_correct"] else "❌"
             print(f"  {status_icon} Answer: {result['final_answer'][:50]}...")
-            print(f"  📊 Tokens: {result['usage']['total_tokens']:,} | Cost: ${result['estimated_cost_usd']:.4f}")
-            if result['coherence_score'] is not None:
+            print(
+                f"  📊 Tokens: {result['usage']['total_tokens']:,} | Cost: "
+                f"${result['estimated_cost_usd']:.4f}"
+            )
+            if result["coherence_score"] is not None:
                 print(f"  🔗 Coherence: {result['coherence_score']:.3f}")
 
         except Exception as e:
             print(f"  ❌ Error: {e}")
-            results.append({
-                "run_id": RUN_ID, "problem_id": problem["problem_id"],
-                "question": problem["question"], "error": str(e),
-                "timestamp": datetime.now().isoformat(),
-            })
+            results.append(
+                {
+                    "run_id": RUN_ID,
+                    "problem_id": problem["problem_id"],
+                    "question": problem["question"],
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
         if i % 10 == 0 and results:
             status = calculate_budget_status(
-                run_id=RUN_ID, processed_results=results, total_items=len(problems),
-                budget_limit_usd=MAX_COST_USD, baseline_stats=baseline_stats,
+                run_id=RUN_ID,
+                processed_results=results,
+                total_items=len(problems),
+                budget_limit_usd=MAX_COST_USD,
+                baseline_stats=baseline_stats,
             )
             print(f"\n{'─' * 70}\n💰 Budget Check ({i}/{len(problems)} problems)\n{'─' * 70}")
-            print(f"Current cost: ${status.total_cost_usd:.2f} | Budget used: {status.budget_used_pct:.1f}%")
+            print(
+                f"Current cost: ${status.total_cost_usd:.2f} | Budget used: "
+                f"{status.budget_used_pct:.1f}%"
+            )
             print(f"Projected total: ${status.projected_total_cost:.2f}")
             if status.cost_vs_baseline_ratio:
                 print(f"vs Baseline: {status.cost_vs_baseline_ratio:.2f}×")
@@ -209,7 +228,7 @@ def main():
                 if status.projected_total_cost > MAX_COST_USD * 1.5:
                     print("\n❌ Projected cost exceeds 150% of budget! Stopping.")
                     break
-    
+
     print(f"\n{'=' * 70}\n EXECUTION COMPLETE\n{'=' * 70}")
 
     valid_results = [r for r in results if "error" not in r]
@@ -217,7 +236,9 @@ def main():
     accuracy = (correct_count / len(valid_results)) * 100 if valid_results else 0
     total_tokens = sum(r["usage"]["total_tokens"] for r in valid_results)
     total_cost = sum(r["estimated_cost_usd"] for r in valid_results)
-    coherence_scores = [r["coherence_score"] for r in valid_results if r["coherence_score"] is not None]
+    coherence_scores = [
+        r["coherence_score"] for r in valid_results if r["coherence_score"] is not None
+    ]
     avg_coherence = sum(coherence_scores) / len(coherence_scores) if coherence_scores else 0
 
     print("\n📊 Results:")
@@ -226,8 +247,11 @@ def main():
     print(f"   Avg coherence: {avg_coherence:.3f}")
 
     final_status = calculate_budget_status(
-        run_id=RUN_ID, processed_results=valid_results, total_items=len(problems),
-        budget_limit_usd=MAX_COST_USD, baseline_stats=baseline_stats,
+        run_id=RUN_ID,
+        processed_results=valid_results,
+        total_items=len(problems),
+        budget_limit_usd=MAX_COST_USD,
+        baseline_stats=baseline_stats,
     )
     print(f"\n{format_budget_summary(final_status)}")
 
@@ -238,8 +262,11 @@ def main():
     print(f"✅ Results saved to: {parquet_path}")
 
     summary = {
-        "run_id": RUN_ID, "accuracy": accuracy, "total_tokens": total_tokens,
-        "total_cost_usd": total_cost, "avg_coherence": avg_coherence,
+        "run_id": RUN_ID,
+        "accuracy": accuracy,
+        "total_tokens": total_tokens,
+        "total_cost_usd": total_cost,
+        "avg_coherence": avg_coherence,
     }
     summary_path = output_dir / f"summary_{RUN_ID}.json"
     with open(summary_path, "w") as f:

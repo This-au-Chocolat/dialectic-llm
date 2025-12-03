@@ -56,9 +56,7 @@ def load_data(file_path, model_name):
         df[f"total_tokens_{model_name}"] = 0
         print(f"Warning: No specific token usage column found in {file_path}. Defaulting to 0.")
 
-    return df[
-        ["problem_id", f"is_correct_{model_name}", f"total_tokens_{model_name}"]
-    ]
+    return df[["problem_id", f"is_correct_{model_name}", f"total_tokens_{model_name}"]]
 
 
 def calculate_mcnemar(df, col1, col2):
@@ -68,10 +66,12 @@ def calculate_mcnemar(df, col1, col2):
     # Ensure the table is 2x2, filling with 0 if necessary
     index_values = [False, True]
     column_values = [False, True]
-    
+
     # Reindex the contingency table to ensure all combinations of True/False exist
-    contingency_table = contingency_table.reindex(index=index_values, columns=column_values).fillna(0)
-    
+    contingency_table = contingency_table.reindex(index=index_values, columns=column_values).fillna(
+        0
+    )
+
     # Ensure the table is sorted consistently
     contingency_table = contingency_table.sort_index(axis=0).sort_index(axis=1)
 
@@ -115,8 +115,11 @@ def main():
 
     # --- McNemar's Test ---
     print("\nPerforming McNemar's test...")
-    pvalue_mamv_vs_baseline = calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_mamv") 
-        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_mamv"]) else None
+    pvalue_mamv_vs_baseline = (
+        calculate_mcnemar(merged_df, "is_correct_baseline", "is_correct_mamv")
+        if not merged_df["is_correct_baseline"].equals(merged_df["is_correct_mamv"])
+        else None
+    )
 
     # --- Prepare results for Parquet and Markdown ---
     kpis = {
