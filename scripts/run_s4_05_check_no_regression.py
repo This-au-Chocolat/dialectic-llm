@@ -20,6 +20,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 BASE_DIR = Path(__file__).parent.parent
 RELEASES_DIR = BASE_DIR / "releases" / "v1.0" / "results"
 CONSOLIDATED_FILE = RELEASES_DIR / "kpi_consolidated.parquet"
+GUARDRAIL_FILE = RELEASES_DIR / "format_guardrail.csv"
 
 # The no-regression criterion: error rate must be <= baseline + THRESHOLD
 THRESHOLD_PP = 2.0
@@ -54,6 +55,9 @@ def main():
     print("No-Regression Check (Criterion: Error Rate <= Baseline + 2pp)")
     print("-" * 60)
 
+    results_list = []
+    timestamp = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+
     for dataset in error_rates.index.get_level_values("dataset").unique():
         try:
             baseline_rate = error_rates.loc[(dataset, "baseline")]
@@ -80,12 +84,50 @@ def main():
                     f"Status: {status}"
                 )
 
+                results_list.append(
+                    {
+                        "timestamp": timestamp,
+                        "dataset": dataset,
+                        "experiment": experiment,
+                        "baseline_error_rate": baseline_rate,
+                        "experiment_error_rate": exp_rate,
+                        "delta_pp": delta,
+                        "threshold_pp": THRESHOLD_PP,
+                        "status": status,
+                    }
+                )
+
             except KeyError:
                 # This is expected if an experiment (e.g., mamv for tqa) was not run
                 logging.info(f"  - No data for experiment '{experiment}'. Skipping check.")
+                results_list.append(
+                    {
+                        "timestamp": timestamp,
+                        "dataset": dataset,
+                        "experiment": experiment,
+                        "baseline_error_rate": baseline_rate,
+                        "experiment_error_rate": float("nan"),
+                        # Use NaN for missing experiment data
+                        "delta_pp": float("nan"),
+                        "threshold_pp": THRESHOLD_PP,
+                        "status": "SKIPPED_NO_DATA",
+                    }
+                )
 
     print("=" * 60)
     logging.info("\nS4-05 No-regression check script finished.")
+
+    # Save results to format_guardrail.csv
+    new_results_df = pd.DataFrame(results_list)
+
+    if GUARDRAIL_FILE.exists():
+        existing_guardrail_df = pd.read_csv(GUARDRAIL_FILE)
+        updated_guardrail_df = pd.concat([existing_guardrail_df, new_results_df], ignore_index=True)
+    else:
+        updated_guardrail_df = new_results_df
+
+    updated_guardrail_df.to_csv(GUARDRAIL_FILE, index=False)
+    logging.info(f"Results saved to {GUARDRAIL_FILE}")
 
 
 if __name__ == "__main__":

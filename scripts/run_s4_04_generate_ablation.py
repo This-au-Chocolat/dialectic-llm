@@ -23,13 +23,20 @@ KPI_FILE = RELEASES_DIR / "kpi_final_s4.parquet"
 OUTPUT_CSV = RELEASES_DIR / "ablation_mamv.csv"
 
 
-def format_cell(accuracy, tokens):
-    """Formats a cell as 'accuracy% / tokens_k'."""
+def format_cell(accuracy, tokens, cost):
+    """Formats a cell as 'accuracy% / tokens_k / $cost_usd'."""
     if pd.isna(accuracy) or pd.isna(tokens):
         return "N/A"
+
     acc_str = f"{accuracy:.0f}%"
     tok_str = f"{tokens/1000:.1f}k"
-    return f"{acc_str} / {tok_str}"
+
+    if pd.isna(cost):
+        cost_str = "N/A"
+    else:
+        cost_str = f"${cost:.2f}"
+
+    return f"{acc_str} / {tok_str} / {cost_str}"
 
 
 def main():
@@ -104,7 +111,9 @@ def main():
         try:
             baseline_row = df_dataset[df_dataset["experiment"] == "baseline"].iloc[0]
             ablation_table.loc["Baseline", "MAMV OFF (k=1)"] = format_cell(
-                baseline_row["accuracy_pct"], baseline_row["total_tokens"]
+                baseline_row["accuracy_pct"],
+                baseline_row["total_tokens"],
+                baseline_row["cost_usd"],
             )
         except IndexError:
             ablation_table.loc["Baseline", "MAMV OFF (k=1)"] = "N/A"
@@ -114,7 +123,7 @@ def main():
         try:
             tas_row = df_dataset[df_dataset["experiment"] == "tas"].iloc[0]
             ablation_table.loc["T-A-S", "MAMV OFF (k=1)"] = format_cell(
-                tas_row["accuracy_pct"], tas_row["total_tokens"]
+                tas_row["accuracy_pct"], tas_row["total_tokens"], tas_row["cost_usd"]
             )
         except IndexError:
             ablation_table.loc["T-A-S", "MAMV OFF (k=1)"] = "N/A"
@@ -122,7 +131,9 @@ def main():
         try:
             mamv_row = df_dataset[df_dataset["experiment"] == "mamv"].iloc[0]
             ablation_table.loc["T-A-S", "MAMV ON (k=1, n=3)"] = format_cell(
-                mamv_row["accuracy_pct"], mamv_row["total_tokens"]
+                mamv_row["accuracy_pct"],
+                mamv_row["total_tokens"],
+                mamv_row["cost_usd"],
             )
         except IndexError:
             ablation_table.loc["T-A-S", "MAMV ON (k=1, n=3)"] = "N/A"

@@ -33,6 +33,7 @@ UNIFIED_COLUMNS = [
     "total_tokens",
     "run_id",
     "has_error",
+    "question",
 ]
 
 # --- File Mappings ---
@@ -123,6 +124,16 @@ def load_and_transform(file_key: str, mapping: dict) -> pd.DataFrame | None:
     if "predicted_answer" not in df.columns:
         if "predicted_answer_raw" in df.columns:
             df["predicted_answer"] = df["predicted_answer_raw"]
+
+    # Sanitize predicted_answer to remove CoT prefixes (e.g., "**SYNTHESIS APPROACH:**")
+    # This ensures "no CoT en outputs públicos"
+    if "predicted_answer" in df.columns:
+        df["predicted_answer"] = (
+            df["predicted_answer"]
+            .astype(str)
+            .str.replace(r"^\*\*SYNTHESIS APPROACH:\*\*.*", "", regex=True)
+            .str.strip()
+        )
 
     # 6. Select and reorder columns according to the unified schema
     df_unified = df[UNIFIED_COLUMNS].copy()
