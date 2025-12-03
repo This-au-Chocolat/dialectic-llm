@@ -1,32 +1,43 @@
 # Dialectic LLM: Tesis–Antítesis–Síntesis
 
-Sistema de razonamiento dialéctico para mejorar la precisión de LLMs en problemas matemáticos mediante el proceso **Tesis → Antítesis → Síntesis (T-A-S)**.
+Sistema de razonamiento dialéctico para evaluar su eficacia en la mejora de la precisión de LLMs en benchmarks de razonamiento, centrándose en el proceso **Tesis → Antítesis → Síntesis (T-A-S)**.
 
-## 🎯 Descripción
+## 🎯 Descripción General del Proyecto
 
-Este proyecto implementa un framework de razonamiento dialéctico que:
-- **Thesis**: Genera una solución inicial con exploración creativa
-- **Antithesis**: Critica y cuestiona la solución propuesta
-- **Synthesis**: Unifica ambas perspectivas en una respuesta mejorada
+Este proyecto explora la hipótesis de que un framework de razonamiento dialéctico puede mejorar la capacidad de los Large Language Models (LLMs) para resolver problemas complejos. El framework opera en tres fases:
+- **Thesis**: Genera una solución inicial (exploración creativa).
+- **Antithesis**: Critica y cuestiona la solución propuesta.
+- **Synthesis**: Unifica ambas perspectivas en una respuesta mejorada y más robusta.
 
-**Objetivo**: Demostrar mejora estadísticamente significativa (ΔAcc ≥ +5pp con ≤2.5× tokens de generación) vs baseline en datasets matemáticos.
+**Objetivo**: Evaluar empíricamente si este método dialéctico ofrece una mejora estadísticamente significativa en la precisión (ΔAcc) y/o una mayor robustez en la resolución de problemas, considerando siempre la eficiencia en el consumo de tokens (costo de generación).
 
-## 📊 Resultados Actuales (Sprint 1)
+### Criterios de Éxito Mínimo (Proyecto)
 
-### Baseline (GSM8K)
-- **Dataset**: 200 problemas GSM8K
-- **Accuracy**: 82.5% (165/200 correctos)
-- **Modelo**: gpt-4o-mini-2024-07-18
+Para considerar el método dialéctico exitoso, se esperaba que:
+- **En al menos un dataset:** ΔAcc ≥ +5pp Y costo ≤2.5× tokens de generación.
+- **En el otro dataset:** ΔAcc ≥ 0pp (no-regresión) Y `invalid/format` ≤ baseline + 2pp.
 
-### T-A-S Pilot
-- **Dataset**: 50 problemas GSM8K (3 comparables con baseline)
-- **Accuracy**: 100% en subset comparable (3/3)
-- **Sistema completo**: Implementado y funcionando end-to-end
+## 📊 Estado Actual y Hallazgos Clave
 
-### Análisis Estadístico (S1-13)
-- **McNemar Test**: Completo y funcionando
-- **KPIs**: Métricas de accuracy, tokens y costos
-- **Reportes**: `/reports/s1_13_analysis_report.md`
+### GSM8K (Problemas de razonamiento matemático estructurado)
+
+*   **Evaluación:** Realizada con 50 problemas (Sprint 2).
+*   **Resultados:**
+    *   **Baseline:** Alta precisión (e.g., 98% accuracy).
+    *   **T-A-S (k=1):** Mostró una **disminución** de precisión (ej. -2pp accuracy) con un **incremento significativo en el costo** (ej. 16× más tokens).
+    *   **T-A-S+MAMV (k=1):** No mejoró la precisión (0pp) y fue aún **más costoso** (ej. 47× más tokens).
+*   **Conclusión:** El método dialéctico T-A-S **no aportó beneficios en precisión** para el dataset GSM8K, un benchmark con respuestas numéricas y directas. La narrativa honesta es que, para este tipo de problemas, el costo computacional no se justifica por una mejora en el rendimiento.
+
+### TruthfulQA (Preguntas engañosas/ambiguas que requieren pensamiento crítico)
+
+*   **Evaluación:** Realizada con 50 problemas (Sprint 3).
+*   **Resultados:** Ambos métodos (Baseline y T-A-S) obtuvieron **0% de precisión** bajo una evaluación de `exact-match` estricta. T-A-S incurrió en **32× más costo**.
+*   **Hallazgo:** La baja precisión se debe principalmente a la **incompatibilidad de la métrica `exact-match`** con las respuestas verbose y de meta-razonamiento generadas por los LLMs (especialmente T-A-S), no a una falla inherente de los métodos. El contenido semántico de las respuestas a menudo es correcto, pero el formato no coincide con la respuesta esperada.
+*   **Conclusión:** TruthfulQA, bajo la métrica actual, **no es un dataset útil para evaluar mejoras de precisión** de nuestro método dialéctico en este contexto.
+
+### Contexto del Método T-A-S
+
+Es crucial entender que el método T-A-S original (Abdali et al., 2025) fue diseñado para **generación de ideas y creatividad**, no para optimizar la precisión en benchmarks de razonamiento como GSM8K o TruthfulQA. Nuestro proyecto ha sido el **primero en evaluar empíricamente T-A-S en estos benchmarks**, demostrando que su valor reside en la generación de razonamiento detallado más que en la mejora de una métrica de precisión estricta.
 
 ## 🚀 Instalación
 
@@ -46,7 +57,7 @@ uv sync
 
 # 3. Configurar variables de entorno
 cp .env.example .env
-# Editar .env con tu OPENAI_API_KEY y otros parámetros
+# Editar .env con tu OPENAI_API_KEY o DEEPSEEK_API_KEY (requerido para los runs)
 ```
 
 ## 🏗️ Estructura del Proyecto
@@ -56,81 +67,74 @@ dialectic-llm/
 ├── src/
 │   ├── flows/              # Prefect flows (baseline, T-A-S)
 │   │   ├── baseline.py     # Flow baseline (single-call)
-│   │   └── tas.py          # Flow T-A-S dialectico (k=1)
-│   ├── utils/              # Utilidades compartidas
-│   │   ├── data_utils.py   # Carga de datos GSM8K consolidada
-│   │   ├── parquet_utils.py # Creación de Parquet consolidada
-│   │   ├── prompt_utils.py  # Templating y hashing (S1-16)
-│   │   ├── sanitize.py     # Sanitización y anonimización
-│   │   ├── log_utils.py    # Logging JSONL
-│   │   └── tokens.py       # Conteo de tokens
-│   ├── eval/               # Evaluación
-│   └── agents/             # (Futuro: MAMV, k=2)
+│   │   └── tas.py          # Flow T-A-S dialéctico (k=1)
+│   ├── utils/              # Utilidades compartidas (data loading, evaluation, logging, etc.)
 ├── configs/
 │   └── model.yaml          # Configuración de modelos
 ├── prompts/
-│   └── tas/                # Templates de prompts
-│       ├── thesis.txt
-│       ├── antithesis.txt
-│       └── synthesis.txt
+│   └── tas/                # Templates de prompts (thesis, antithesis, synthesis)
 ├── logs/
-│   └── events/             # JSONL compartidos (sanitizados)
-├── logs_local/             # JSONL locales con CoT (gitignored)
+│   └── events/             # Logs JSONL sanitizados de las ejecuciones
+├── logs_local/             # Logs JSONL locales con Chain-of-Thought completo (gitignored)
 ├── analytics/
-│   └── parquet/            # Datasets para análisis
-├── tests/                  # 81 tests unitarios
-└── reports/                # Análisis y documentación
+│   └── parquet/            # Archivos Parquet para análisis de resultados
+├── tests/                  # Tests unitarios del proyecto
+└── reports/                # Documentación y análisis de sprints
 ```
 
-## 🎮 Uso
+## 🎮 Uso (Reproducción de Corridas Clave)
 
-### 1. Ejecutar Baseline
+Este proyecto se enfoca en la evaluación del método T-A-S. Para reproducir las corridas principales:
+
+### 1. Preparar IDs de Problemas Comunes (TruthfulQA)
+
+Para asegurar la comparabilidad estadística, se utiliza un conjunto fijo de `problem_ids`.
 
 ```bash
-# Ejecutar baseline en 200 problemas GSM8K
-uv run python -m src.flows.baseline --n 200 --seed 42
-
-# Resultados en:
-# - logs/events/baseline_*.jsonl
-# - analytics/parquet/baseline_*.parquet
+# (Este archivo ya debería existir en `data/processed/common_problem_ids.txt`)
+# Si no existe, puedes generarlo desde el script de preparación de datos,
+# asegurándote de usar los mismos 50 IDs de TruthfulQA para todos los runs.
 ```
 
-### 2. Ejecutar T-A-S Flow
+### 2. Ejecutar Baseline en TruthfulQA (50 problemas)
+
+Este script ejecuta la línea base en el dataset TruthfulQA.
 
 ```bash
-# Ejecutar T-A-S en N problemas
-uv run python -m src.flows.tas --n 50 --seed 42
-
-# Resultados en:
-# - logs/events/tas_*.jsonl (sanitizados)
-# - logs_local/tas_*.jsonl (con CoT completo)
-# - analytics/parquet/tas_*.parquet
+uv run python scripts/run_s3_07_baseline_tqa_50.py
+# Resultados en: analytics/parquet/baseline_tqa_50_*.parquet
 ```
 
-### 3. Análisis Estadístico
+### 3. Ejecutar T-A-S (k=1) en TruthfulQA (50 problemas)
+
+Este script ejecuta el flujo T-A-S dialéctico en TruthfulQA.
 
 ```bash
-# Ejecutar McNemar test y KPIs
-uv run python run_s1_13_analysis.py
-
-# Genera: reports/s1_13_analysis_report.md
+uv run python scripts/run_s3_08_tas_tqa_50.py
+# Resultados en: analytics/parquet/tas_tqa_50_*.parquet
 ```
 
-## 🧪 Tests
+### 4. Análisis de KPI y Taxonomía de Errores
+
+Tras ejecutar las corridas, se pueden generar los KPIs y la taxonomía de errores.
 
 ```bash
-# Ejecutar todos los tests
-uv run pytest tests/
+# Ejecutar el análisis de KPIs (si está disponible un script actualizado para TQA)
+# `scripts/run_s3_13_mcnemar_analysis.py` -> Aún enfocado en GSM8K, adaptable para TQA.
 
-# Tests específicos
-uv run pytest tests/test_prompt_utils.py -v
-uv run pytest tests/test_data_utils.py -v
-
-# Con cobertura
-uv run pytest tests/ --cov=src --cov-report=html
+# Generar taxonomía de errores (ya realizada con resultados en analytics/parquet/)
+# Los resultados de la taxonomía de errores (S3-15) ya están disponibles en:
+# - `analytics/parquet/error_taxonomy_labeled.parquet`
+# - `analytics/parquet/error_category_counts.json`
 ```
 
-**Estado actual**: 81/81 tests pasando ✅
+## ❌ Características No Exploradas/Eliminadas
+
+Durante el desarrollo, se tomaron decisiones de diseño y alcance para mantener el enfoque y la eficiencia del proyecto:
+
+*   **Uso explícito de "Debate"**: Si bien el método T-A-S es inherentemente dialéctico, la implementación de un "corpus de debate" o prompts de debate explícitos (más allá de T-A-S) se consideró un feature adicional costoso y no esencial para la hipótesis principal, siendo eliminada del plan.
+*   **T-A-S con k=2 (múltiples rondas)**: La ejecución de T-A-S con `k=2` (dos rondas de T-A-S) fue eliminada debido a su **alto costo computacional** (ej. 100× el baseline) y a que el desempeño de `k=1` no justificó una mayor exploración.
+*   **Re-corridas extensas en GSM8K**: Tras los resultados del Sprint 2, que mostraron que T-A-S no mejoró la precisión en GSM8K, se decidió no realizar re-corridas extensas en este dataset para el análisis final, priorizando TruthfulQA.
 
 ## 🔐 Seguridad y Privacidad
 
@@ -140,142 +144,26 @@ uv run pytest tests/ --cov=src --cov-report=html
 - Logs compartidos en `logs/events/` están sanitizados
 
 ### Sanitización
-- PII detectado y redactado (emails, teléfonos, SSN, etc.)
-- Prompts y respuestas hasheados (`prompt_hash`, `response_hash`)
-- Whitelist estricta de campos permitidos
+- Información Personal Identificable (PII) detectada y redactada.
+- Prompts y respuestas hasheados (`prompt_hash`, `response_hash`).
+- Whitelist estricta de campos permitidos.
 
 ### Seguridad de Costos
-- Límite de $5 por ejecución
-- Alertas antes de exceder presupuesto
-- Conteo de tokens automático
+- Límites de costo por ejecución y alertas para evitar exceder el presupuesto.
+- Conteo de tokens automático para monitoreo.
 
-## 📚 Features Implementados (Sprint 1)
+## 🧪 Tests
 
-### ✅ Infraestructura (S1-01 a S1-05)
-- [x] Repo con `uv` y estructura de carpetas
-- [x] CI/CD con GitHub Actions (lint + tests)
-- [x] Loader GSM8K + normalización
-- [x] Evaluador exact-match
-- [x] Contador de tokens
+```bash
+# Ejecutar todos los tests
+uv run pytest tests/
 
-### ✅ Flows Prefect (S1-06 a S1-08)
-- [x] Baseline runner (≥200 problemas)
-- [x] T-A-S núcleo con control de temperatura
-- [x] Orquestación Prefect T→A→S (k=1)
+# Tests específicos (ejemplo)
+uv run pytest tests/test_prompt_utils.py -v
 
-### ✅ Logging y Analytics (S1-09 a S1-10)
-- [x] Logger JSONL + sanitización
-- [x] Agregación a Parquet
-
-### ✅ Testing y Ejecución (S1-11 a S1-12)
-- [x] 81 unit tests (cobertura crítica)
-- [x] Pilot run T-A-S (~50 problemas)
-
-### ✅ Análisis (S1-13)
-- [x] McNemar test baseline vs T-A-S
-- [x] KPIs (accuracy, tokens, costos)
-
-### ✅ Documentación (S1-14 a S1-16)
-- [x] README actualizado
-- [x] Reporte Sprint 1
-- [x] Templating de prompts + hashing (S1-16)
-
-## � Features Implementados (Sprint 2)
-
-### ✅ Robustez y Escalado (S2-01)
-- [x] Retry logic con exponential backoff (1s→2s→4s)
-- [x] Rate limit detection y manejo
-- [x] Prefect flow enhancements
-
-### ✅ Dataset Versioning (S2-04)
-- [x] 200 problem IDs from S1 baseline (seed=42)
-- [x] Content hash verification (3f35ab4bbd)
-- [x] 1-to-1 statistical comparison support
-
-### ✅ Coherencia Semántica (S2-07)
-- [x] SentenceTransformer embeddings (all-mpnet-base-v2)
-- [x] Coherence scoring (Thesis→Synthesis)
-- [x] Cosine similarity calculations
-
-### ✅ Budget Monitoring (S2-09)
-- [x] Token cap per item (≤8k tokens)
-- [x] Budget alerts at 90% threshold
-- [x] Cost tracking vs baseline (≤1.5× target)
-- [x] Real-time projections
-
-## ️ Características Técnicas
-
-### Budget Monitoring y Token Caps (S2-09)
-```python
-from src.utils.budget_monitor import (
-    calculate_budget_status,
-    should_alert_budget,
-    format_budget_alert,
-    load_baseline_stats_from_parquet
-)
-
-# Cargar baseline
-baseline = load_baseline_stats_from_parquet("analytics/parquet/baseline_200.parquet")
-
-# Calcular status actual
-status = calculate_budget_status(
-    run_id="s2-tas-k1",
-    processed_results=results,
-    total_items=200,
-    budget_limit_usd=60.0,
-    baseline_stats=baseline
-)
-
-# Verificar alertas
-if should_alert_budget(status):
-    print(format_budget_alert(status))
-
-# Verificar objetivo ≤1.5× baseline
-if status.is_within_budget_target():
-    print("✅ Within target")
+# Con cobertura
+uv run pytest tests/ --cov=src --cov-report=html
 ```
-
-### Prompt Templating y Hashing (S1-16)
-```python
-from src.utils.prompt_utils import (
-    hash_prompt,
-    hash_response,
-    create_prompt,
-    list_templates
-)
-
-# Crear prompt desde template
-prompt = create_prompt("tas_thesis", {"question": "What is 2 + 2?"})
-
-# Generar hashes (SHA-256)
-prompt_hash = hash_prompt(prompt)
-response_hash = hash_response("The answer is 4")
-
-# Templates disponibles
-templates = list_templates()
-# ['baseline_gsm8k', 'tas_thesis', 'tas_antithesis', 'tas_synthesis']
-```
-
-### Consolidación de Código
-- **70% reducción** en funciones de creación de Parquet
-- **97% reducción** en funciones de carga de datos GSM8K
-- **80% reducción** en funciones de extracción de respuestas
-- Wrappers legacy para compatibilidad hacia atrás
-
-## 📈 Próximos Pasos (Sprint 2+)
-
-### Sprint 2 Objetivos
-- [ ] Alcanzar **Éxito mínimo**: ΔAcc ≥ +5pp con ≤2.5× tokens
-- [ ] McNemar p < 0.05 en ≥200 ítems
-- [ ] MAMV (3 instancias) con votación mayoría
-- [ ] Análisis cualitativo (taxonomía de errores)
-
-### Features Futuras
-- [ ] T-A-S con k=2 (multiple rounds)
-- [ ] Soporte para TriviaQA dataset
-- [ ] Métricas de coherencia T→S
-- [ ] CLI avanzada
-- [ ] Dashboard de visualización
 
 ## 👥 Equipo
 
@@ -293,9 +181,9 @@ templates = list_templates()
 
 - [GSM8K Dataset](https://github.com/openai/grade-school-math)
 - [Prefect Documentation](https://docs.prefect.io/)
-- [Paper (TBD)]
+- [Paper Original T-A-S (Abdali et al., 2025)](https://arxiv.org/abs/2501.14917)
+- [Paper del Proyecto (TBD)]
 
 ---
 
-**Sprint 1 Status**: 16/16 tareas completadas (100%) ✅
-**Last Updated**: 2025-11-18
+**Última Actualización**: 2 de diciembre de 2025
