@@ -1,0 +1,9 @@
+timestamp,dataset,experiment,baseline_error_rate,experiment_error_rate,delta_pp,threshold_pp,status
+2025-12-03 00:39:26,gsm8k,tas,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:26,gsm8k,mamv,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:26,truthful_qa,tas,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:26,truthful_qa,mamv,0.0,,,2.0,SKIPPED_NO_DATA
+2025-12-03 00:39:48,gsm8k,tas,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:48,gsm8k,mamv,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:48,truthful_qa,tas,0.0,0.0,0.0,2.0,✅ PASSED
+2025-12-03 00:39:48,truthful_qa,mamv,0.0,,,2.0,SKIPPED_NO_DATA
