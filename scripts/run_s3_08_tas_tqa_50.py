@@ -32,8 +32,11 @@ if not os.getenv("DEEPSEEK_API_KEY") and not os.getenv("OPENAI_API_KEY"):
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from dialectic_llm.data import load_truthfulqa_problems, normalize_truthfulqa_answer
-from flows.tas import TASFlowConfig, run_tas_k1
+from dialectic_llm.data import (  # noqa: E402
+    load_truthfulqa_problems,
+    normalize_truthfulqa_answer,
+)
+from flows.tas import TASFlowConfig, run_tas_k1  # noqa: E402
 
 # Configuración
 N_PROBLEMS = 50

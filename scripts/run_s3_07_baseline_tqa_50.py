@@ -33,12 +33,15 @@ if not os.getenv("DEEPSEEK_API_KEY") and not os.getenv("OPENAI_API_KEY"):
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-import time
+import time  # noqa: E402
 
-from dialectic_llm.data import load_truthfulqa_problems, normalize_truthfulqa_answer
-from llm.client import LLMClient
-from utils.log_utils import log_event_jsonl
-from utils.retry_utils import exponential_backoff_with_jitter
+from dialectic_llm.data import (  # noqa: E402
+    load_truthfulqa_problems,
+    normalize_truthfulqa_answer,
+)
+from llm.client import LLMClient  # noqa: E402
+from utils.log_utils import log_event_jsonl  # noqa: E402
+from utils.retry_utils import exponential_backoff_with_jitter  # noqa: E402
 
 # Configuración
 N_PROBLEMS = 50
